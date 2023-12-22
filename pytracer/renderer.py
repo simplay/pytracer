@@ -15,16 +15,31 @@ class Renderer:
     channels = 3
 
     @staticmethod
-    def init_shared_state(shared_array_base_red, shared_array_base_green, shared_array_base_blue):
+    def init_shared_state(
+            shared_array_base_red,
+            shared_array_base_green,
+            shared_array_base_blue,
+            shared_array_base_red_count,
+            shared_array_base_green_count,
+            shared_array_base_blue_count,
+    ):
         """ store pixels for later use """
 
         global pixels_red
         global pixels_green
         global pixels_blue
 
+        global pixel_red_count
+        global pixel_green_count
+        global pixel_blue_count
+
         pixels_red = np.ctypeslib.as_array(shared_array_base_red.get_obj())
         pixels_green = np.ctypeslib.as_array(shared_array_base_green.get_obj())
         pixels_blue = np.ctypeslib.as_array(shared_array_base_blue.get_obj())
+
+        pixel_red_count = np.ctypeslib.as_array(shared_array_base_red_count.get_obj())
+        pixel_green_count = np.ctypeslib.as_array(shared_array_base_green_count.get_obj())
+        pixel_blue_count = np.ctypeslib.as_array(shared_array_base_blue_count.get_obj())
 
     @staticmethod
     def compute_contribution(render_task: RenderTask) -> RenderTask:
@@ -33,7 +48,7 @@ class Renderer:
         # perform actual computations here...
         for idx in render_task.indices:
             samples = render_task.scene.sampler.make_sample(render_task.spp, 2)
-            print(samples)
+
             for sample in samples:
                 #  compute 2D image lookup coordinates (rowIdx, colIdx) from 1D index value
                 row_idx = idx / render_task.width
@@ -45,6 +60,10 @@ class Renderer:
                 pixels_red[idx] += spectrum[0]
                 pixels_green[idx] += spectrum[1]
                 pixels_blue[idx] += spectrum[2]
+
+                pixel_red_count[idx] += 1
+                pixel_green_count[idx] += 1
+                pixel_blue_count[idx] += 1
 
         print(render_task.indices)
 
@@ -97,13 +116,21 @@ class Renderer:
         shared_array_base_green = multiprocessing.Array(ctypes.c_double, n)
         shared_array_base_blue = multiprocessing.Array(ctypes.c_double, n)
 
+        shared_array_base_red_count = multiprocessing.Array(ctypes.c_int, n)
+        shared_array_base_green_count = multiprocessing.Array(ctypes.c_int, n)
+        shared_array_base_blue_count = multiprocessing.Array(ctypes.c_int, n)
+
         start_time = time.time()
         with Pool(processes=cpu_count,
                   initializer=self.init_shared_state,
                   initargs=(
                           shared_array_base_red,
                           shared_array_base_green,
-                          shared_array_base_blue
+                          shared_array_base_blue,
+                          shared_array_base_red_count,
+                          shared_array_base_green_count,
+                          shared_array_base_blue_count,
+
                   )) as pool:
             pool.map(self.compute_contribution, tasks)
 
@@ -114,5 +141,13 @@ class Renderer:
         red = np.reshape(shared_array_base_red, newshape=new_shape)
         green = np.reshape(shared_array_base_blue, newshape=new_shape)
         blue = np.reshape(shared_array_base_green, newshape=new_shape)
+
+        red_count = np.reshape(shared_array_base_red_count, newshape=new_shape)
+        green_count = np.reshape(shared_array_base_blue_count, newshape=new_shape)
+        blue_count = np.reshape(shared_array_base_green_count, newshape=new_shape)
+
+        red = red / red_count
+        green = green / green_count
+        blue = blue / blue_count
 
         self.write_image(red, green, blue)
