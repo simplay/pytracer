@@ -1,0 +1,4 @@
+ctag
+*.png
+.idea
+__pycache__
