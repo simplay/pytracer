@@ -33,16 +33,18 @@ class Renderer:
         # perform actual computations here...
         for idx in render_task.indices:
             samples = render_task.scene.sampler.make_sample(render_task.spp, 2)
+            print(samples)
             for sample in samples:
                 #  compute 2D image lookup coordinates (rowIdx, colIdx) from 1D index value
                 row_idx = idx / render_task.width
                 col_idx = idx % render_task.width
 
-                render_task.scene.camera.make_worldspace_ray(row_idx, col_idx, sample)
+                ray = render_task.scene.camera.make_worldspace_ray(row_idx, col_idx, sample)
+                spectrum = render_task.scene.integrator.integrate(ray)
 
-                pixels_red[idx] = 0
-                pixels_green[idx] = 0.5
-                pixels_blue[idx] = 0.75
+                pixels_red[idx] += spectrum[0]
+                pixels_green[idx] += spectrum[1]
+                pixels_blue[idx] += spectrum[2]
 
         print(render_task.indices)
 

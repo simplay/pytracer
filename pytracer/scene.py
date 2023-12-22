@@ -1,6 +1,7 @@
 from pytracer import Camera
 import numpy as np
 
+from pytracer.debug_integrator import DebugIntegrator
 from pytracer.one_sampler import OneSampler
 
 
@@ -10,6 +11,7 @@ class Scene:
         self.height = height
         self.camera = self.build_camera()
         self.sampler = OneSampler()
+        self.integrator = DebugIntegrator()
 
     def build_camera(self):
         eye = np.array([0.5, 0.5, 0.5])
