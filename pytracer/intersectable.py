@@ -1,12 +1,13 @@
 from abc import ABC, abstractmethod
 
-from pytracer.hit_record import HitRecord
+#from pytracer.hit_record import HitRecord
 from pytracer.ray import Ray
 
 
 class Intersectable(ABC):
+
     @abstractmethod
-    def intersect(self, ray: Ray) -> HitRecord:
+    def intersect(self, ray: Ray):
         """
         Implement ray-surface intersection in this method. Implementations of this
         method need to make and return a {@link HitRecord} correctly, following

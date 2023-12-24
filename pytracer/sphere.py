@@ -7,7 +7,7 @@ from pytracer.ray import Ray
 
 
 class Sphere(Intersectable):
-    def __int__(self,
+    def __init__(self,
                 material: Material,
                 center: np.array,
                 radius: float):
@@ -72,8 +72,8 @@ class Sphere(Intersectable):
         smaller and positive t.
         """
 
-        oc = np.copy(ray.origin) - self.center
-        rd = np.copy(ray.direction)
+        oc = np.copy(ray.origin[:3]) - self.center
+        rd = np.copy(ray.direction[:3])
 
         a = rd.dot(rd)
         b = 2.0 * rd.dot(oc)
@@ -88,21 +88,21 @@ class Sphere(Intersectable):
             zeros = [t1, t2]
 
         if len(zeros) < 2:
-            return HitRecord()
+            return HitRecord.make_empty()
         else:
             t = np.min(zeros)
             if t < 0:
                 t = np.max(zeros)
                 if t < 0:
-                    return HitRecord()
+                    return HitRecord.make_empty()
 
         hit_position = ray.point_at(t)
         hit_normal = (1.0 / self.radius) * (np.copy(hit_position) - self.center)
 
         w_in = -np.copy(ray.direction)
-        w_in = w_in / np.dot(w_in)
+        w_in = w_in / np.sqrt(np.dot(w_in))
 
-        return HitRecord(
+        hit_record = HitRecord(
             t=t,
             position=hit_position,
             normal=hit_normal,
@@ -113,3 +113,5 @@ class Sphere(Intersectable):
             i=ray.i,
             j=ray.j
         )
+
+        return hit_record

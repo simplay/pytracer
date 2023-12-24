@@ -105,6 +105,7 @@ class Renderer:
 
     def render(self, spp: int, thread_count: int = None) -> None:
         cpu_count = thread_count or multiprocessing.cpu_count()
+        print(f"Starting {cpu_count} threads")
         index_groups = self.compute_indices_groups(index_count=self.width * self.height, cpu_count=cpu_count)
 
         tasks = []
