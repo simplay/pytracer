@@ -65,9 +65,10 @@ class HitRecord:
             tangent=np.copy(other_hit_record.tangent),
             w_in=np.copy(other_hit_record.w_in),
             material=other_hit_record.material,
+            intersectable=other_hit_record.intersectable,
             i=other_hit_record.i,
             j=other_hit_record.j,
-            is_null=(not other_hit_record.is_valid())
+            is_null=other_hit_record.is_null
         )
         return hit_record
 

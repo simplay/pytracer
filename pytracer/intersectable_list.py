@@ -19,7 +19,7 @@ class IntersectableList(Intersectable):
             current_t = current_hit_record.t
             if min_t > current_t > 0.0:
                 min_t = current_t
-                hit_record = HitRecord(current_hit_record)
+                hit_record = HitRecord.make_from_other(current_hit_record)
 
         return hit_record
 

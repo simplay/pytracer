@@ -100,7 +100,7 @@ class Sphere(Intersectable):
         hit_normal = (1.0 / self.radius) * (np.copy(hit_position) - self.center)
 
         w_in = -np.copy(ray.direction)
-        w_in = w_in / np.sqrt(np.dot(w_in))
+        w_in = w_in / np.linalg.norm(w_in)
 
         hit_record = HitRecord(
             t=t,

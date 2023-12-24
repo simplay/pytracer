@@ -23,5 +23,5 @@ class Ray:
             self.origin = Ray.ESP * direction + origin
 
     def point_at(self, t: float):
-        hit_position = t * np.copy(self.direction) + self.origin
+        hit_position = t * np.copy(self.direction[:3]) + self.origin
         return hit_position

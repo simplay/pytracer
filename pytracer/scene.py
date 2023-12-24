@@ -32,6 +32,6 @@ class Scene:
                       height=self.height)
 
     def build_intersectables(self):
-        sphere = Sphere(None, np.array([0.0, 0.0, 0.0]), 0.5)
+        sphere = Sphere(None, np.array([0.0, 0.0, 0.0]), 1.5)
         self.intersectable_list.append(sphere)
 

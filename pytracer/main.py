@@ -25,4 +25,4 @@ def process(index: int):
 if __name__ == '__main__':
     scene = Scene(width=640, height=480)
     renderer = Renderer(scene)
-    renderer.render(3, 12)
+    renderer.render(3, 20)
