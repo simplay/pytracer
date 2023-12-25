@@ -2,6 +2,7 @@ from PIL import Image
 import numpy as np
 import multiprocessing
 from multiprocessing import Pool
+from threading import Timer
 import time
 import random
 import ctypes
@@ -11,17 +12,25 @@ from pytracer import RenderTask
 from pytracer import Scene
 
 
+class RepeatTimer(Timer):
+    def run(self):
+        while not self.finished.wait(self.interval):
+            self.function(*self.args, **self.kwargs)
+
+
 class Renderer:
     channels = 3
 
     @staticmethod
     def init_shared_state(
+            n,
             shared_array_base_red,
             shared_array_base_green,
             shared_array_base_blue,
             shared_array_base_red_count,
             shared_array_base_green_count,
             shared_array_base_blue_count,
+            raw_shared_status
     ):
         """ store pixels for later use """
 
@@ -33,6 +42,8 @@ class Renderer:
         global pixel_green_count
         global pixel_blue_count
 
+        global shared_status
+
         pixels_red = np.ctypeslib.as_array(shared_array_base_red.get_obj())
         pixels_green = np.ctypeslib.as_array(shared_array_base_green.get_obj())
         pixels_blue = np.ctypeslib.as_array(shared_array_base_blue.get_obj())
@@ -41,10 +52,12 @@ class Renderer:
         pixel_green_count = np.ctypeslib.as_array(shared_array_base_green_count.get_obj())
         pixel_blue_count = np.ctypeslib.as_array(shared_array_base_blue_count.get_obj())
 
+        shared_status = np.ctypeslib.as_array(raw_shared_status.get_obj())
+        for idx in range(n):
+            shared_status[idx] = 0
+
     @staticmethod
     def compute_contribution(render_task: RenderTask) -> RenderTask:
-        print(pixels_red)
-
         # perform actual computations here...
         for idx in render_task.indices:
             samples = render_task.scene.sampler.make_sample(render_task.spp, 2)
@@ -65,7 +78,7 @@ class Renderer:
                 pixel_green_count[idx] += 1
                 pixel_blue_count[idx] += 1
 
-        print(render_task.indices)
+            shared_status[idx] = 1
 
         return render_task
 
@@ -121,22 +134,37 @@ class Renderer:
         shared_array_base_green_count = multiprocessing.Array(ctypes.c_int, n)
         shared_array_base_blue_count = multiprocessing.Array(ctypes.c_int, n)
 
-        start_time = time.time()
-        with Pool(processes=cpu_count,
-                  initializer=self.init_shared_state,
-                  initargs=(
-                          shared_array_base_red,
-                          shared_array_base_green,
-                          shared_array_base_blue,
-                          shared_array_base_red_count,
-                          shared_array_base_green_count,
-                          shared_array_base_blue_count,
+        raw_shared_status = multiprocessing.Array(ctypes.c_int, n)
 
-                  )) as pool:
+        def display():
+            completed_task_count = np.sum(raw_shared_status)
+            percentage = int(100 * (completed_task_count / n))
+            print(f"{time.strftime('%H:%M:%S')} - Progress: {str(percentage)}% ")
+
+        timer = RepeatTimer(1, display)
+        timer.start()
+
+        start_time = time.time()
+        with Pool(
+                processes=cpu_count,
+                initializer=self.init_shared_state,
+                initargs=(
+                        n,
+                        shared_array_base_red,
+                        shared_array_base_green,
+                        shared_array_base_blue,
+                        shared_array_base_red_count,
+                        shared_array_base_green_count,
+                        shared_array_base_blue_count,
+                        raw_shared_status
+
+                )) as pool:
             pool.map(self.compute_contribution, tasks)
 
         end_time = time.time()
-        print(f"done in {end_time - start_time} seconds")
+        print(f"Completed raytracing in {end_time - start_time} seconds")
+
+        timer.cancel()
 
         new_shape = (self.height, self.width)
         red = np.reshape(shared_array_base_red, newshape=new_shape)
