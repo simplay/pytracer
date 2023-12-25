@@ -122,7 +122,7 @@ class Renderer:
         index_groups = self.compute_indices_groups(index_count=self.width * self.height, cpu_count=cpu_count)
 
         tasks = []
-        for idx in range(0, thread_count):
+        for idx in range(0, cpu_count):
             tasks.append(RenderTask(scene=self.scene, indices=index_groups[idx], spp=spp))
 
         n = self.height * self.width
@@ -162,9 +162,10 @@ class Renderer:
             pool.map(self.compute_contribution, tasks)
 
         end_time = time.time()
+        timer.cancel()
+        display()
         print(f"Completed raytracing in {end_time - start_time} seconds")
 
-        timer.cancel()
 
         new_shape = (self.height, self.width)
         red = np.reshape(shared_array_base_red, newshape=new_shape)
