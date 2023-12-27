@@ -6,16 +6,16 @@ from pytracer.material import Material
 
 class HitRecord:
     def __init__(self,
-                t: float,
-                position: np.array,
-                normal: np.array,
-                tangent: np.array,
-                w_in: np.array,
-                material: Material,
-                intersectable: Intersectable,
-                i=0,
-                j=0,
-                is_null=False):
+                 t: float,
+                 position: np.array,
+                 normal: np.array,
+                 tangent: np.array,
+                 w_in: np.array,
+                 material: Material,
+                 intersectable: Intersectable,
+                 i=0,
+                 j=0,
+                 is_null=False):
         """
         @param t parameter on ray where the hit occurred.
         @param position where the ray hit the surface
@@ -53,6 +53,23 @@ class HitRecord:
             i=0,
             j=0,
             is_null=True
+        )
+        return hit_record
+
+    @classmethod
+    def make_with_material(cls, position, material):
+        zero_v3 = np.array([0, 0, 0])
+        hit_record = HitRecord(
+            t=0.0,
+            position=position,
+            normal=np.copy(zero_v3),
+            tangent=np.copy(zero_v3),
+            w_in=np.copy(zero_v3),
+            material=material,
+            intersectable=None,
+            i=-1,
+            j=-1,
+            is_null=False
         )
         return hit_record
 
