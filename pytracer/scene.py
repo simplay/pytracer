@@ -5,6 +5,7 @@ from pytracer.debug_integrator import DebugIntegrator
 from pytracer.diffuse import Diffuse
 from pytracer.intersectable_list import IntersectableList
 from pytracer.one_sampler import OneSampler
+from pytracer.plane import Plane
 from pytracer.point_light import PointLight
 from pytracer.sphere import Sphere
 
@@ -23,8 +24,8 @@ class Scene:
         self.build_light_sources()
 
     def build_camera(self):
-        eye = np.array([0.0, 0.0, 3.0])
-        look_at = np.array([0.0, 0.0, 0.0])
+        eye = np.array([0.5, 0.5, 3.0])
+        look_at = np.array([0.5, 0.0, 0.0])
         up = np.array([0.0, 1.0, 0.0])
         aspect_ratio = self.width / self.height
         return Camera(eye=eye,
@@ -42,12 +43,19 @@ class Scene:
             center=np.array([-r, -r, 0.0]),
             radius=r
         )
-        self.intersectable_list.append(sphere)
+        # self.intersectable_list.append(sphere)
+
+        boring_gray = Diffuse((np.array([0.5, 0.5, 0.5])))
+        self.intersectable_list.append(Plane(boring_gray, normal=np.array([1.0, 0.0, 0.0]), distance=1))
+        self.intersectable_list.append(Plane(boring_gray, normal=np.array([-1.0, 0.0, 0.0]), distance=1))
+        self.intersectable_list.append(Plane(boring_gray, normal=np.array([0.0, 1.0, 0.0]), distance=1))
+        self.intersectable_list.append(Plane(boring_gray, normal=np.array([0.0, -1.0, 0.0]), distance=1))
+        self.intersectable_list.append(Plane(boring_gray, normal=np.array([0.0, 0.0, 1.0]), distance=1))
 
     def build_light_sources(self):
         self.light_sources.append(
             PointLight(
-                position=np.array([0.5, 0.5, 2.0]),
-                emission=10*np.array([1, 1, 1])
+                position=np.array([0.0, 0.0, 3.0]),
+                emission=10 * np.array([1, 1, 1])
             )
         )

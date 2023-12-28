@@ -38,6 +38,7 @@ class DebugIntegrator:
             return [0, 0, 0]
 
         if hit_record.t > 0:
+            #return [0, 1, 0]
 
             # color = hit_record.intersectable.material.evaluate_brdf(None, None, None)
 
@@ -47,7 +48,6 @@ class DebugIntegrator:
                 contribution += current_contribution
 
             return contribution
-            # return [0, 1, 0]
 
         # r, g, b = random.random(), 0.5, random.random()
         return [1, 0, 0]

@@ -52,7 +52,8 @@ class Camera:
         self.width = width
         self.height = height
 
-        w = (eye - look_at)
+        to = np.copy(look_at)
+        w = (eye - to)
         w = w / np.linalg.norm(w)
 
         u = np.cross(up, w)
@@ -64,10 +65,10 @@ class Camera:
             [*u, 0.0],
             [*v, 0.0],
             [*w, 0.0],
-            [*eye, 1]
+            [*eye, 1.0]
         ])
 
-        angular_fov = math.pi * (fov / 180.0)
+        angular_fov = np.pi * (fov / 180.0)
         self.top = math.tan(angular_fov / 2.0)
         self.bottom = -self.top
         self.right = aspect_ratio * self.top
@@ -90,8 +91,8 @@ class Camera:
 
         s1, s2 = samples[0], samples[1]
 
-        u_ij = self.left + (self.right - self.left) * (i * s1) / self.width
-        v_ij = self.bottom + (self.top - self.bottom) * (j * s2) / self.height
+        u_ij = self.left + (self.right - self.left) * (i + s1) / self.width
+        v_ij = self.bottom + (self.top - self.bottom) * (j + s2) / self.height
         w_ij = -1.0
 
         v = np.array([u_ij, v_ij, w_ij, 0])
