@@ -24,8 +24,8 @@ class Scene:
         self.build_light_sources()
 
     def build_camera(self):
-        eye = np.array([0.5, 0.5, 3.0])
-        look_at = np.array([0.5, 0.0, 0.0])
+        eye = np.array([0.0, 0.0, 3.0])
+        look_at = np.array([0.01, 0.01, 0.01])
         up = np.array([0.0, 1.0, 0.0])
         aspect_ratio = self.width / self.height
         return Camera(eye=eye,
@@ -37,13 +37,13 @@ class Scene:
                       height=self.height)
 
     def build_intersectables(self):
-        r = 1.5
+        r = 0.4
         sphere = Sphere(
             material=Diffuse(np.array([0, 0, 1])),
-            center=np.array([-r, -r, 0.0]),
+            center=np.array([0.0, 0.0, 0.0]),
             radius=r
         )
-        # self.intersectable_list.append(sphere)
+        self.intersectable_list.append(sphere)
 
         boring_gray = Diffuse((np.array([0.5, 0.5, 0.5])))
         self.intersectable_list.append(Plane(boring_gray, normal=np.array([1.0, 0.0, 0.0]), distance=1))
@@ -53,9 +53,25 @@ class Scene:
         self.intersectable_list.append(Plane(boring_gray, normal=np.array([0.0, 0.0, 1.0]), distance=1))
 
     def build_light_sources(self):
+        light_position = np.array([0.1, 0.7, 2.6])
         self.light_sources.append(
             PointLight(
-                position=np.array([0.0, 0.0, 3.0]),
+                position=light_position,
                 emission=10 * np.array([1, 1, 1])
             )
         )
+
+        light_position = np.array([0.4, 0.7, 0.4])
+        self.light_sources.append(
+            PointLight(
+                position=light_position,
+                emission=10 * np.array([0, 1, 1])
+            )
+        )
+        r = 0.03
+        sphere = Sphere(
+            material=Diffuse(np.array([1, 0, 0]), casts_shadows=False),
+            center=light_position + 0.5*r*np.array([1, 1, 1]),
+            radius=r
+        )
+        self.intersectable_list.append(sphere)

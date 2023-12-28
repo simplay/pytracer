@@ -4,11 +4,12 @@ from pytracer.material import Material
 
 
 class Diffuse(Material):
-    def __init__(self, emission: np.array):
+    def __init__(self, emission: np.array, casts_shadows=True):
         """
         @param [np.array] vector with rgb contributions
         """
-        self.emission = emission * (1.0 / np.pi)
+        self.emission = emission / np.pi
+        self.casts_shadows = casts_shadows
 
     def evaluate_brdf(self, hit_record, w_out, w_in) -> np.array:
         return self.emission
@@ -23,4 +24,4 @@ class Diffuse(Material):
         return False
 
     def does_cast_shadows(self) -> bool:
-        return True
+        return self.casts_shadows
