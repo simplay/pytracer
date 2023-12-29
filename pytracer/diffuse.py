@@ -15,6 +15,8 @@ class Diffuse(Material):
         return self.emission
 
     def evaluate_emission(self, _hit_record, _w_out) -> np.array:
+        if _hit_record.normal.dot(_w_out) < 0:
+            _hit_record.normal = -_hit_record.normal
         return np.array([0, 0, 0])
 
     def has_specular_reflexion(self) -> bool:

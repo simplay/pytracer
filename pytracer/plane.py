@@ -65,10 +65,11 @@ class Plane(Intersectable):
 
         """
         # angle theta between the ray direction and the plane normal
-        cos_theta = ray.direction[:3].dot(self.normal)
+        #cos_theta = ray.direction[:3].dot(self.normal)
+        cos_theta = self.normal.dot(ray.direction[:3])
 
         # TODO: handle to small normals and return an empty hit
-        if np.abs(cos_theta) <= 0.0001:
+        if np.abs(cos_theta) <= 0.000001:
             return HitRecord.make_empty()
 
         # assumption: point is zero and then we shift by distance

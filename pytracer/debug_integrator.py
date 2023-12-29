@@ -36,17 +36,21 @@ class DebugIntegrator:
         if self.is_occluded(hit_record.position, light_direction, d2):
             return np.array([0.0, 0.0, 0.0])
 
-        contribution = hit_record.material.evaluate_brdf(hit_record, hit_record.w_in, light_direction)
-        opposite_light_direction = -np.copy(light_hit.position)
+        brdf = hit_record.material.evaluate_brdf(hit_record, hit_record.w_in, light_direction)
+        opposite_light_direction = -np.copy(light_direction)
         light_emission = light_hit.material.evaluate_emission(light_hit, opposite_light_direction)
 
-        contribution = contribution * light_emission
+        angle = 1.0
+        if np.linalg.norm(light_hit.normal) > 0:
+            angle = light_hit.normal.dot(light_direction)
 
-        angle = hit_record.normal.dot(light_direction)
-        cos_theta = np.max([angle, 0])
-        contribution *= cos_theta
+        cos_theta_light = np.max([angle, 0])
 
-        contribution /= d2
+        cos_theta = hit_record.normal.dot(light_direction)
+        cos_theta = np.max([cos_theta, 0])
+
+        # Multiply together factors relevant for shading, that is, brdf * light_emission * cos_theta_light * geometry term
+        contribution = (1.0 / d2) * brdf * light_emission * cos_theta_light * cos_theta
 
         return contribution
 
@@ -55,6 +59,10 @@ class DebugIntegrator:
 
         if not hit_record.is_valid():
             return [0.0, 0.0, 0.0]
+
+        emission = hit_record.material.evaluate_emission(hit_record, hit_record.w_in[:3])
+        if emission is None:
+            return emission
 
         if hit_record.t > 0.0:
             # return [0, 1, 0]
@@ -69,4 +77,4 @@ class DebugIntegrator:
             return contribution
 
         # r, g, b = random.random(), 0.5, random.random()
-        return [1, 0, 0]
+        return [0, 1, 0]
