@@ -102,6 +102,14 @@ class Renderer:
         for y in range(img_data.shape[0]):
             for x in range(img_data.shape[1]):
                 r, g, b = red[y][x], green[y][x], blue[y][x]
+
+                if r > 1:
+                    r = 1.0
+                if g > 1:
+                    g = 1.0
+                if b > 1:
+                    b = 1.0
+
                 img_data[y][x][0] = r * 255
                 img_data[y][x][1] = g * 255
                 img_data[y][x][2] = b * 255
@@ -165,7 +173,6 @@ class Renderer:
         timer.cancel()
         display()
         print(f"Completed raytracing in {end_time - start_time} seconds")
-
 
         new_shape = (self.height, self.width)
         red = np.reshape(shared_array_base_red, newshape=new_shape)

@@ -4,7 +4,7 @@ import numpy as np
 class Ray:
     ESP = 0.00001
 
-    def __init__(self, origin: np.array, direction: np.array, i=-1, j=-1, perturbate=True):
+    def __init__(self, origin: np.array, direction: np.array, i=-1, j=-1, perturbate=True, bounces=0):
         """
         @param origin
         @param direction
@@ -18,6 +18,7 @@ class Ray:
         self.i = i
         self.j = j
         self.perturbate = perturbate
+        self.bounces = bounces
 
         if perturbate:
             self.origin = Ray.ESP * direction + origin

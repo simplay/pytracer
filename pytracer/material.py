@@ -48,5 +48,6 @@ class Material(ABC):
     def has_specular_refraction(self) -> bool:
         pass
 
+    @abstractmethod
     def does_cast_shadows(self) -> bool:
         pass

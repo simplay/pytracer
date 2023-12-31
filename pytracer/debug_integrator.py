@@ -31,8 +31,6 @@ class DebugIntegrator:
         light_direction = np.copy(light_hit.position) - hit_record.position
         d2 = light_direction.dot(light_direction)
 
-        light_direction = light_direction / np.linalg.norm(light_direction)
-
         if self.is_occluded(hit_record.position, light_direction, d2):
             return np.array([0.0, 0.0, 0.0])
 
@@ -50,11 +48,13 @@ class DebugIntegrator:
         cos_theta = np.max([cos_theta, 0])
 
         # Multiply together factors relevant for shading, that is, brdf * light_emission * cos_theta_light * geometry term
-        contribution = (1.0 / d2) * brdf * light_emission * cos_theta_light * cos_theta
+        contribution = (1.0 / np.sqrt(d2)) * brdf * light_emission * cos_theta_light * cos_theta
 
         return contribution
 
     def integrate(self, ray: Ray):
+        MAX_BOUNCES = 5
+
         hit_record = self.scene.intersectable_list.intersect(ray)
 
         if not hit_record.is_valid():
@@ -64,17 +64,27 @@ class DebugIntegrator:
         if emission is None:
             return emission
 
-        if hit_record.t > 0.0:
-            # return [0, 1, 0]
+        reflection_contribution = np.array([0.0, 0.0, 0.0])
+        refraction_contribution = np.array([0.0, 0.0, 0.0])
 
-            # color = hit_record.intersectable.material.evaluate_brdf(None, None, None)
+        if hit_record.material.has_specular_reflexion() and ray.bounces < MAX_BOUNCES:
+            sample = hit_record.material.evaluate_specular_reflection(hit_record)
+            if sample.is_valid:
+                reflection_contribution = np.copy(sample.brdf)
+                reflected_ray = Ray(
+                    origin=np.copy(hit_record.position),
+                    direction=sample.w,
+                    bounces=ray.bounces + 1
+                )
+                spec = self.integrate(reflected_ray)
+                reflection_contribution *= spec
 
-            contribution = np.array([0.0, 0.0, 0.0])
-            for light_source in self.scene.light_sources:
-                current_contribution = self.contribution_of(light_source, hit_record)
-                contribution += current_contribution
+        if hit_record.material.has_specular_reflexion() or hit_record.material.has_specular_refraction():
+            return reflection_contribution + refraction_contribution
 
-            return contribution
+        contribution = np.array([0.0, 0.0, 0.0])
+        for light_source in self.scene.light_sources:
+            current_contribution = self.contribution_of(light_source, hit_record)
+            contribution += current_contribution
 
-        # r, g, b = random.random(), 0.5, random.random()
-        return [0, 1, 0]
+        return contribution
