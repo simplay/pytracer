@@ -6,6 +6,8 @@ from pytracer.ray import Ray
 
 from typing import TYPE_CHECKING
 
+from pytracer.math.vec3 import Vec3
+
 if TYPE_CHECKING:
     from pytracer import Material
 
@@ -13,15 +15,10 @@ if TYPE_CHECKING:
 class Plane(Intersectable):
 
     # A*x + B*y + C*z + D = 0
-    def __init__(self, material: 'Material', normal: np.array, distance):
+    def __init__(self, material: 'Material', normal: Vec3, distance):
         self.material = material
         self.distance = distance
         self.normal = normal
-
-    @classmethod
-    def incident_direction(cls, v):
-        w_in = -np.copy(v)
-        return w_in / np.linalg.norm(w_in)
 
     def intersect(self, ray: Ray) -> HitRecord:
         """
@@ -74,7 +71,7 @@ class Plane(Intersectable):
         """
         # angle theta between the ray direction and the plane normal
         # cos_theta = ray.direction[:3].dot(self.normal)
-        cos_theta = self.normal.dot(ray.direction[:3])
+        cos_theta = self.normal.dot(ray.direction)
 
         # TODO: handle to small normals and return an empty hit
         if np.abs(cos_theta) <= 0.000001:
@@ -87,9 +84,10 @@ class Plane(Intersectable):
             return HitRecord.make_empty()
 
         intersection_position = ray.point_at(t)
-        w_in = Plane.incident_direction(ray.direction[:3])
-        hit_normal = np.copy(self.normal)
-        hit_tangent = np.cross(np.array([1, 0, 0]), hit_normal)
+        w_in = ray.direction.incident_direction()
+
+        hit_normal = Vec3(*self.normal)
+        hit_tangent = Vec3.one().cross(hit_normal)
 
         hit_record = HitRecord(
             t=t,

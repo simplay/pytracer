@@ -1,18 +1,17 @@
-import numpy as np
-
 from pytracer.materials.material import Material
 from pytracer.shading_sample import ShadingSample
+from pytracer.math.vec3 import Vec3
 
 
 class ReflectiveMaterial(Material):
-    def __init__(self, ks: np.array):
+    def __init__(self, ks: Vec3):
         self.ks = ks
 
-    def evaluate_brdf(self, hit_record: 'HitRecord', w_out: np.array, w_in: np.array) -> np.array:
-        return np.array([1.0, 1.0, 1.0])
+    def evaluate_brdf(self, hit_record: 'HitRecord', w_out: Vec3, w_in: Vec3) -> Vec3:
+        return Vec3.one()
 
-    def evaluate_emission(self, hit_record: 'HitRecord', w_out: np.array) -> np.array:
-        return np.array([0.0, 0.0, 0.0])
+    def evaluate_emission(self, hit_record: 'HitRecord', w_out: Vec3) -> Vec3:
+        return Vec3.zero()
 
     def has_specular_reflexion(self) -> bool:
         return True
@@ -23,19 +22,12 @@ class ReflectiveMaterial(Material):
     def does_cast_shadows(self) -> bool:
         return True
 
-    # TODO: move to material
-    @staticmethod
-    def inv_reflected(w_in: np.array, normal: np.array):
-        cos_theta_i = normal.dot(w_in)
-        return 2.0 * cos_theta_i * normal - w_in
-
-    # TODO: move to material
-    def evaluate_specular_reflection(self, hit_record: 'HitRecord'):
-        reflected_direction = ReflectiveMaterial.inv_reflected(hit_record.w_in[:3], hit_record.normal)
+    def evaluate_specular_reflection(self, hit_record: 'HitRecord') -> ShadingSample:
+        reflected_direction: Vec3 = hit_record.w_in.reflected_on(hit_record.normal)
         return ShadingSample(
             brdf=self.ks,
-            emission=np.array([0.0, 0.0, 0.0]),
+            emission=Vec3.zero(),
             w=reflected_direction,
             is_specular=True,
-            p=1
+            p=1.0
         )

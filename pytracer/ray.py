@@ -1,10 +1,10 @@
-import numpy as np
+from pytracer.math.vec3 import Vec3
 
 
 class Ray:
     ESP = 0.00001
 
-    def __init__(self, origin: np.array, direction: np.array, i=-1, j=-1, perturbate=True, bounces=0):
+    def __init__(self, origin: Vec3, direction: Vec3, i=-1, j=-1, perturbate=True, bounces=0):
         """
         @param origin
         @param direction
@@ -24,5 +24,4 @@ class Ray:
             self.origin = Ray.ESP * direction + origin
 
     def point_at(self, t: float):
-        hit_position = t * np.copy(self.direction[:3]) + self.origin
-        return hit_position
+        return t * self.direction + self.origin

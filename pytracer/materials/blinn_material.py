@@ -1,8 +1,8 @@
 import math
 
-import numpy as np
-
 from pytracer.materials.material import Material
+from pytracer.shading_sample import ShadingSample
+from pytracer.math.vec3 import Vec3
 
 
 class BlinnMaterial(Material):
@@ -10,23 +10,22 @@ class BlinnMaterial(Material):
     https://en.wikipedia.org/wiki/Blinn%E2%80%93Phong_reflection_model
     """
 
-    def __init__(self, diffuse: 'np.array', specular: 'np.array', shininess: float):
+    def __init__(self, diffuse: Vec3, specular: Vec3, shininess: float):
         self.diffuse = diffuse
         self.specular = specular
         self.shininess = shininess
 
-    def evaluate_brdf(self, hit_record: 'HitRecord', w_out: np.array, w_in: np.array) -> np.array:
+    def evaluate_brdf(self, hit_record: 'HitRecord', w_out: Vec3, w_in: Vec3) -> Vec3:
         ambient_contribution = self.diffuse
         diffuse_contribution = self.diffuse * w_in.dot(hit_record.normal)
 
-        half_vector = np.copy(w_in[:3]) + w_out[:3]
-        half_vector = half_vector / np.linalg.norm(half_vector)
+        half_vector = Vec3.from_other(w_in + w_out).normalized()
         specular_contribution = self.specular * math.pow(half_vector.dot(hit_record.normal), self.shininess)
 
         return ambient_contribution + diffuse_contribution + specular_contribution
 
-    def evaluate_emission(self, hit_record: 'HitRecord', w_out: np.array) -> np.array:
-        return np.array([0.0, 0.0, 0.0])
+    def evaluate_emission(self, hit_record: 'HitRecord', w_out: Vec3) -> Vec3:
+        return Vec3.zero()
 
     def has_specular_reflexion(self) -> bool:
         return False
@@ -36,3 +35,6 @@ class BlinnMaterial(Material):
 
     def does_cast_shadows(self) -> bool:
         return True
+
+    def evaluate_specular_reflection(self, hit_record: 'HitRecord') -> ShadingSample:
+        return ShadingSample.make_empty()

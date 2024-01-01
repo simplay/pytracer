@@ -1,8 +1,8 @@
-import numpy as np
+from pytracer.math.vec3 import Vec3
 
 
 class ShadingSample:
-    def __init__(self, brdf: np.array, emission: np.array, w: np.array, is_specular: bool, p: float, is_valid=True):
+    def __init__(self, brdf: Vec3, emission: Vec3, w: Vec3, is_specular: bool, p: float, is_valid=True):
         self.brdf = brdf
         self.emission = emission
         self.w = w
@@ -13,9 +13,9 @@ class ShadingSample:
     @classmethod
     def make_empty(cls):
         return ShadingSample(
-            brdf=np.array([0.0, 0.0, 0.0]),
-            emission=np.array([0.0, 0.0, 0.0]),
-            w=np.array([0.0, 0.0, 0.0]),
+            brdf=Vec3.zero(),
+            emission=Vec3.zero(),
+            w=Vec3.zero(),
             is_specular=False,
             p=0,
             is_valid=False

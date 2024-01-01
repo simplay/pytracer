@@ -1,11 +1,10 @@
 from abc import ABC, abstractmethod
 
-import numpy as np
-
 from pytracer.ray import Ray
+from pytracer.math.vec3 import Vec3
 
 
 class Integrator(ABC):
     @abstractmethod
-    def integrate(self, ray: Ray) -> np.array:
+    def integrate(self, ray: Ray) -> Vec3:
         pass

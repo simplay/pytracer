@@ -10,6 +10,7 @@ from pytracer.intersectables.geometries.plane import Plane
 from pytracer.light_sources.point_light import PointLight
 from pytracer.materials.reflective_material import ReflectiveMaterial
 from pytracer.intersectables.geometries.sphere import Sphere
+from pytracer.math.vec3 import Vec3
 
 
 class Scene:
@@ -26,9 +27,9 @@ class Scene:
         self.build_light_sources()
 
     def build_camera(self):
-        eye = np.array([-1.5, 0.0, 7.0])
-        look_at = np.array([0.0, 0.0, 0.0])
-        up = np.array([0.0, 1.0, 0.0])
+        eye = Vec3(-1.5, 0.0, 7.0)
+        look_at = Vec3(0.0, 0.0, 0.0)
+        up = Vec3(0.0, 1.0, 0.0)
         aspect_ratio = self.width / self.height
         return Camera(eye=eye,
                       look_at=look_at,
@@ -73,11 +74,10 @@ class Scene:
         r = 0.03
         sphere = Sphere(
             material=DiffuseMaterial(np.array([1, 0, 0]), casts_shadows=False),
-            center=light_position + 0.5*r*np.array([1, 1, 1]),
+            center=light_position + 0.5 * r * np.array([1, 1, 1]),
             radius=r
         )
-        #self.intersectable_list.append(sphere)
-
+        # self.intersectable_list.append(sphere)
 
         light_position = np.array([0.4, 0.7, 0.4])
         self.light_sources.append(
@@ -89,8 +89,7 @@ class Scene:
         r = 0.03
         sphere = Sphere(
             material=DiffuseMaterial(np.array([1, 0, 0]), casts_shadows=False),
-            center=light_position + 0.5*r*np.array([1, 1, 1]),
+            center=light_position + 0.5 * r * np.array([1, 1, 1]),
             radius=r
         )
-        #self.intersectable_list.append(sphere)
-
+        # self.intersectable_list.append(sphere)

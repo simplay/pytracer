@@ -4,12 +4,13 @@ from pytracer.hit_record import HitRecord
 from pytracer.intersectables.intersectable import Intersectable
 from pytracer.materials.material import Material
 from pytracer.ray import Ray
+from pytracer.math.vec3 import Vec3
 
 
 class Sphere(Intersectable):
     def __init__(self,
                  material: Material,
-                 center: np.array,
+                 center: Vec3,
                  radius: float):
 
         """
@@ -72,12 +73,12 @@ class Sphere(Intersectable):
         smaller and positive t.
         """
 
-        oc = np.copy(ray.origin[:3]) - self.center
-        rd = np.copy(ray.direction[:3])
+        oc = ray.origin - self.center
+        rd = ray.direction
 
-        a = rd.dot(rd)
+        a = rd.dotted()
         b = 2.0 * rd.dot(oc)
-        c = oc.dot(oc) - self.radius ** 2.0
+        c = oc.dotted() - self.radius ** 2.0
 
         discriminant = b * b - 4.0 * a * c
 
@@ -97,16 +98,15 @@ class Sphere(Intersectable):
                     return HitRecord.make_empty()
 
         hit_position = ray.point_at(t)
-        hit_normal = (1.0 / self.radius) * (np.copy(hit_position) - self.center)
+        hit_normal = (1.0 / self.radius) * (hit_position - self.center)
 
-        w_in = -np.copy(ray.direction)
-        w_in = w_in / np.linalg.norm(w_in)
+        w_in = ray.direction.incident_direction()
 
         hit_record = HitRecord(
             t=t,
             position=hit_position,
             normal=hit_normal,
-            tangent=np.array([0, 0, 0]),
+            tangent=Vec3.zero(),
             w_in=w_in,
             material=self.material,
             intersectable=self,

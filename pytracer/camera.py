@@ -2,6 +2,7 @@ import numpy as np
 import math
 
 from pytracer.ray import Ray
+from pytracer.math.vec3 import Vec3
 
 
 # We define our camera by:
@@ -35,11 +36,13 @@ from pytracer.ray import Ray
 # The viewing frustum defines the 3d volume that is projected within image
 # boundaries and is defined by the vertical field-of-view and the aspect
 # ratio.
+
+
 class Camera:
     def __init__(self,
-                 eye: np.ndarray,
-                 look_at: np.ndarray,
-                 up: np.ndarray,
+                 eye: Vec3,
+                 look_at: Vec3,
+                 up: Vec3,
                  fov: float,
                  aspect_ratio: float,
                  width: float,
@@ -52,14 +55,9 @@ class Camera:
         self.width = width
         self.height = height
 
-        to = np.copy(look_at)
-        w = (eye - to)
-        w = w / np.linalg.norm(w)
-
-        u = np.cross(up, w)
-        u = u / np.linalg.norm(u)
-
-        v = np.cross(w, u)
+        w: Vec3 = (eye - look_at).normalized()
+        u = up.cross(w).normalized()
+        v = w.cross(u)
 
         self.matrix = np.array([
             [*u, 0.0],
@@ -96,6 +94,6 @@ class Camera:
         w_ij = -1.0
 
         v = np.array([u_ij, v_ij, w_ij, 0])
-        p_uvw = self.matrix.dot(v)
+        p_uvw = Vec3(*self.matrix.dot(v))
 
         return Ray(self.eye.copy(), p_uvw, i, j, perturbate=False)

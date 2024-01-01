@@ -1,20 +1,19 @@
-import numpy as np
-
 from pytracer.intersectables.intersectable import Intersectable
 from pytracer.materials.material import Material
+from pytracer.math.vec3 import Vec3
 
 
 class HitRecord:
     def __init__(self,
                  t: float,
-                 position: np.array,
-                 normal: np.array,
-                 tangent: np.array,
-                 w_in: np.array,
+                 position: Vec3,
+                 normal: Vec3,
+                 tangent: Vec3,
+                 w_in: Vec3,
                  material: Material,
                  intersectable: Intersectable,
-                 i=0,
-                 j=0,
+                 i=0,  # TODO: rename to u
+                 j=0,  # j TODO: rename to v texture lookup coordinates in plane space
                  is_null=False):
         """
         @param t parameter on ray where the hit occurred.
@@ -44,10 +43,10 @@ class HitRecord:
     def make_empty(cls):
         hit_record = HitRecord(
             t=0,
-            position=np.array([0, 0, 0]),
-            normal=np.array([0, 0, 0]),
-            tangent=np.array([0, 0, 0]),
-            w_in=np.array([0, 0, 0]),
+            position=Vec3.zero(),
+            normal=Vec3.zero(),
+            tangent=Vec3.zero(),
+            w_in=Vec3.zero(),
             material=None,
             intersectable=None,
             i=0,
@@ -57,14 +56,13 @@ class HitRecord:
         return hit_record
 
     @classmethod
-    def make_with_material(cls, position: np.array, material: Material):
-        zero_v3 = np.array([0, 0, 0])
+    def make_with_material(cls, position: Vec3, material: Material) -> 'HitRecord':
         hit_record = HitRecord(
             t=0.0,
             position=position,
-            normal=np.copy(zero_v3),
-            tangent=np.copy(zero_v3),
-            w_in=np.copy(zero_v3),
+            normal=Vec3.zero(),
+            tangent=Vec3.zero(),
+            w_in=Vec3.zero(),
             material=material,
             intersectable=None,
             i=-1,
@@ -74,13 +72,13 @@ class HitRecord:
         return hit_record
 
     @classmethod
-    def make_from_other(cls, other_hit_record: 'HitRecord'):
+    def make_from_other(cls, other_hit_record: 'HitRecord') -> 'HitRecord':
         hit_record = HitRecord(
             t=other_hit_record.t,
-            position=np.copy(other_hit_record.position),
-            normal=np.copy(other_hit_record.normal),
-            tangent=np.copy(other_hit_record.tangent),
-            w_in=np.copy(other_hit_record.w_in),
+            position=Vec3.from_other(other_hit_record.position),
+            normal=Vec3.from_other(other_hit_record.normal),
+            tangent=Vec3.from_other(other_hit_record.tangent),
+            w_in=Vec3.from_other(other_hit_record.w_in),
             material=other_hit_record.material,
             intersectable=other_hit_record.intersectable,
             i=other_hit_record.i,
@@ -89,5 +87,5 @@ class HitRecord:
         )
         return hit_record
 
-    def is_valid(self):
+    def is_valid(self) -> bool:
         return not self.is_null
