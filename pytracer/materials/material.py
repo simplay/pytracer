@@ -48,7 +48,7 @@ class Material(ABC):
         pass
 
     @abstractmethod
-    def has_specular_reflexion(self) -> bool:
+    def has_specular_reflection(self) -> bool:
         pass
 
     @abstractmethod

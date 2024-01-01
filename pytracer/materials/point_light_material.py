@@ -21,7 +21,7 @@ class PointLightMaterial(Material):
     def has_specular_refraction(self) -> bool:
         return False
 
-    def has_specular_reflexion(self) -> bool:
+    def has_specular_reflection(self) -> bool:
         return False
 
     def does_cast_shadows(self) -> bool:

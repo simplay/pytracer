@@ -13,7 +13,7 @@ class ReflectiveMaterial(Material):
     def evaluate_emission(self, hit_record: 'HitRecord', w_out: Vec3) -> Vec3:
         return Vec3.zero()
 
-    def has_specular_reflexion(self) -> bool:
+    def has_specular_reflection(self) -> bool:
         return True
 
     def has_specular_refraction(self) -> bool:
