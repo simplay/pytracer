@@ -2,13 +2,18 @@ import numpy as np
 
 from typing import TYPE_CHECKING
 
+from pytracer.integrators.integrator import Integrator
 from pytracer.ray import Ray
 
 if TYPE_CHECKING:
     from pytracer import HitRecord, Scene
 
 
-class DebugIntegrator:
+class WhittedIntegrator(Integrator):
+    """
+    http://gec.di.uminho.pt/DISCIP/Minf/IFR0708/TP/pbrtTutorial3.pdf
+    """
+
     def __init__(self, scene: 'Scene'):
         self.scene = scene
 
@@ -54,7 +59,7 @@ class DebugIntegrator:
 
         return contribution
 
-    def integrate(self, ray: Ray):
+    def integrate(self, ray: Ray) -> np.array:
         MAX_BOUNCES = 5
 
         hit_record = self.scene.intersectable_list.intersect(ray)

@@ -2,7 +2,7 @@ from pytracer import Camera
 import numpy as np
 
 from pytracer.materials.blinn_material import BlinnMaterial
-from pytracer.debug_integrator import DebugIntegrator
+from pytracer.integrators.whitted_integrator import WhittedIntegrator
 from pytracer.materials.diffuse_material import DiffuseMaterial
 from pytracer.intersectables.containers.intersectable_list import IntersectableList
 from pytracer.one_sampler import OneSampler
@@ -18,7 +18,7 @@ class Scene:
         self.height = height
         self.camera = self.build_camera()
         self.sampler = OneSampler()
-        self.integrator = DebugIntegrator(self)
+        self.integrator = WhittedIntegrator(self)
         self.intersectable_list = IntersectableList()
         self.light_sources = []
 
