@@ -3,7 +3,7 @@ import numpy as np
 from pytracer.material import Material
 
 
-class Diffuse(Material):
+class DiffuseMaterial(Material):
     def __init__(self, emission: np.array, casts_shadows=True):
         """
         @param [np.array] vector with rgb contributions

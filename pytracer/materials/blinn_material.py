@@ -5,7 +5,7 @@ import numpy as np
 from pytracer.material import Material
 
 
-class Blinn(Material):
+class BlinnMaterial(Material):
     """
     https://en.wikipedia.org/wiki/Blinn%E2%80%93Phong_reflection_model
     """

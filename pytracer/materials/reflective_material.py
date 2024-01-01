@@ -4,7 +4,7 @@ from pytracer.material import Material
 from pytracer.shading_sample import ShadingSample
 
 
-class Reflective(Material):
+class ReflectiveMaterial(Material):
     def __init__(self, ks: np.array):
         self.ks = ks
 
@@ -31,7 +31,7 @@ class Reflective(Material):
 
     # TODO: move to material
     def evaluate_specular_reflection(self, hit_record: 'HitRecord'):
-        reflected_direction = Reflective.inv_reflected(hit_record.w_in[:3], hit_record.normal)
+        reflected_direction = ReflectiveMaterial.inv_reflected(hit_record.w_in[:3], hit_record.normal)
         return ShadingSample(
             brdf=self.ks,
             emission=np.array([0.0, 0.0, 0.0]),

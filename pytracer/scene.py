@@ -1,14 +1,14 @@
 from pytracer import Camera
 import numpy as np
 
-from pytracer.blinn import Blinn
+from pytracer.materials.blinn_material import BlinnMaterial
 from pytracer.debug_integrator import DebugIntegrator
-from pytracer.diffuse import Diffuse
+from pytracer.materials.diffuse_material import DiffuseMaterial
 from pytracer.intersectable_list import IntersectableList
 from pytracer.one_sampler import OneSampler
 from pytracer.plane import Plane
 from pytracer.point_light import PointLight
-from pytracer.reflective import Reflective
+from pytracer.materials.reflective_material import ReflectiveMaterial
 from pytracer.sphere import Sphere
 
 
@@ -40,10 +40,10 @@ class Scene:
 
     def build_intersectables(self):
         r = 0.4
-        boring_gray = Diffuse((np.array([0.5, 0.5, 0.5])))
+        boring_gray = DiffuseMaterial((np.array([0.5, 0.5, 0.5])))
 
-        mirror = Reflective(ks=np.array([1.0, 1.0, 1.0]))
-        blinn_material = Blinn(
+        mirror = ReflectiveMaterial(ks=np.array([1.0, 1.0, 1.0]))
+        blinn_material = BlinnMaterial(
             diffuse=np.array([.8, 0.0, 0.0]),
             specular=np.array([0.4, 0.4, 0.4]),
             shininess=50.0
@@ -72,7 +72,7 @@ class Scene:
         )
         r = 0.03
         sphere = Sphere(
-            material=Diffuse(np.array([1, 0, 0]), casts_shadows=False),
+            material=DiffuseMaterial(np.array([1, 0, 0]), casts_shadows=False),
             center=light_position + 0.5*r*np.array([1, 1, 1]),
             radius=r
         )
@@ -88,7 +88,7 @@ class Scene:
         )
         r = 0.03
         sphere = Sphere(
-            material=Diffuse(np.array([1, 0, 0]), casts_shadows=False),
+            material=DiffuseMaterial(np.array([1, 0, 0]), casts_shadows=False),
             center=light_position + 0.5*r*np.array([1, 1, 1]),
             radius=r
         )
