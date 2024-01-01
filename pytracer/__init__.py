@@ -3,4 +3,4 @@ from .scene import Scene
 from .render_task import RenderTask
 from .renderer import Renderer
 from .hit_record import HitRecord
-from .material import Material
+from pytracer.materials.material import Material

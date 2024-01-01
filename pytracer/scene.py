@@ -4,12 +4,12 @@ import numpy as np
 from pytracer.materials.blinn_material import BlinnMaterial
 from pytracer.debug_integrator import DebugIntegrator
 from pytracer.materials.diffuse_material import DiffuseMaterial
-from pytracer.intersectable_list import IntersectableList
+from pytracer.intersectables.containers.intersectable_list import IntersectableList
 from pytracer.one_sampler import OneSampler
-from pytracer.plane import Plane
+from pytracer.intersectables.geometries.plane import Plane
 from pytracer.point_light import PointLight
 from pytracer.materials.reflective_material import ReflectiveMaterial
-from pytracer.sphere import Sphere
+from pytracer.intersectables.geometries.sphere import Sphere
 
 
 class Scene:

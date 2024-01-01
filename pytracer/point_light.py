@@ -1,7 +1,7 @@
 import numpy as np
 
 from pytracer.hit_record import HitRecord
-from pytracer.material import Material
+from pytracer.materials.material import Material
 
 
 class PointLightMaterial(Material):

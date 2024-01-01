@@ -2,7 +2,7 @@ import math
 
 import numpy as np
 
-from pytracer.material import Material
+from pytracer.materials.material import Material
 
 
 class BlinnMaterial(Material):

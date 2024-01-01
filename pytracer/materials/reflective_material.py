@@ -1,6 +1,6 @@
 import numpy as np
 
-from pytracer.material import Material
+from pytracer.materials.material import Material
 from pytracer.shading_sample import ShadingSample
 
 

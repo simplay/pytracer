@@ -1,7 +1,7 @@
 import numpy as np
 
 from pytracer.hit_record import HitRecord
-from pytracer.intersectable import Intersectable
+from pytracer.intersectables.intersectable import Intersectable
 from pytracer.ray import Ray
 
 from typing import TYPE_CHECKING

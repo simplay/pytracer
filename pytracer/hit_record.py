@@ -1,7 +1,7 @@
 import numpy as np
 
-from pytracer.intersectable import Intersectable
-from pytracer.material import Material
+from pytracer.intersectables.intersectable import Intersectable
+from pytracer.materials.material import Material
 
 
 class HitRecord:
