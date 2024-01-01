@@ -7,7 +7,7 @@ from pytracer.materials.diffuse_material import DiffuseMaterial
 from pytracer.intersectables.containers.intersectable_list import IntersectableList
 from pytracer.one_sampler import OneSampler
 from pytracer.intersectables.geometries.plane import Plane
-from pytracer.point_light import PointLight
+from pytracer.light_sources.point_light import PointLight
 from pytracer.materials.reflective_material import ReflectiveMaterial
 from pytracer.intersectables.geometries.sphere import Sphere
 
