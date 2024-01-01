@@ -8,9 +8,9 @@ from pytracer.ray import Ray
 
 class Sphere(Intersectable):
     def __init__(self,
-                material: Material,
-                center: np.array,
-                radius: float):
+                 material: Material,
+                 center: np.array,
+                 radius: float):
 
         """
         @param material

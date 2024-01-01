@@ -10,12 +10,12 @@ class Blinn(Material):
     https://en.wikipedia.org/wiki/Blinn%E2%80%93Phong_reflection_model
     """
 
-    def __init__(self, diffuse: np.array, specular: np.array, shininess: float):
+    def __init__(self, diffuse: 'np.array', specular: 'np.array', shininess: float):
         self.diffuse = diffuse
         self.specular = specular
         self.shininess = shininess
 
-    def evaluate_brdf(self, hit_record, w_out, w_in) -> np.array:
+    def evaluate_brdf(self, hit_record: 'HitRecord', w_out: np.array, w_in: np.array) -> np.array:
         ambient_contribution = self.diffuse
         diffuse_contribution = self.diffuse * w_in.dot(hit_record.normal)
 
@@ -25,7 +25,7 @@ class Blinn(Material):
 
         return ambient_contribution + diffuse_contribution + specular_contribution
 
-    def evaluate_emission(self, hit_record, w_out) -> np.array:
+    def evaluate_emission(self, hit_record: 'HitRecord', w_out: np.array) -> np.array:
         return np.array([0.0, 0.0, 0.0])
 
     def has_specular_reflexion(self) -> bool:

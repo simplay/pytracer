@@ -4,11 +4,16 @@ from pytracer.hit_record import HitRecord
 from pytracer.intersectable import Intersectable
 from pytracer.ray import Ray
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pytracer import Material
+
 
 class Plane(Intersectable):
 
     # A*x + B*y + C*z + D = 0
-    def __init__(self, material, normal: np.array, distance):
+    def __init__(self, material: 'Material', normal: np.array, distance):
         self.material = material
         self.distance = distance
         self.normal = normal
@@ -18,8 +23,11 @@ class Plane(Intersectable):
         w_in = -np.copy(v)
         return w_in / np.linalg.norm(w_in)
 
-    def intersect(self, ray: Ray):
+    def intersect(self, ray: Ray) -> HitRecord:
         """
+        @param ray
+        @return HitRecord
+
         In the following a derivation of the intersection formula we are using in this implementation to compute the plane ray intersection:
 
         A plane can be defined by a normal n and a point p0 on the plane. In this case, every other point p on the plane fulfills:
@@ -65,7 +73,7 @@ class Plane(Intersectable):
 
         """
         # angle theta between the ray direction and the plane normal
-        #cos_theta = ray.direction[:3].dot(self.normal)
+        # cos_theta = ray.direction[:3].dot(self.normal)
         cos_theta = self.normal.dot(ray.direction[:3])
 
         # TODO: handle to small normals and return an empty hit

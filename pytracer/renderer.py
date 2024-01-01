@@ -94,7 +94,7 @@ class Renderer:
         random.shuffle(indices)
         return np.array_split(indices, cpu_count)
 
-    def write_image(self, red, blue, green):
+    def write_image(self, red: list, blue: list, green: list):
         start_time = time.time()
         img_data = np.zeros((self.height, self.width, self.channels), dtype=np.uint8)
 
@@ -125,6 +125,10 @@ class Renderer:
         output_image.save(filepath)
 
     def render(self, spp: int, thread_count: int = None) -> None:
+        """
+        @param spp [int] samples per pixel
+        @param thread_count the number of threads used to render the image. By default, the total number of available threads is used.
+        """
         cpu_count = thread_count or multiprocessing.cpu_count()
         print(f"Starting {cpu_count} threads")
         index_groups = self.compute_indices_groups(index_count=self.width * self.height, cpu_count=cpu_count)
@@ -144,12 +148,12 @@ class Renderer:
 
         raw_shared_status = multiprocessing.Array(ctypes.c_int, n)
 
-        def display():
+        def show_progress():
             completed_task_count = np.sum(raw_shared_status)
             percentage = int(100 * (completed_task_count / n))
             print(f"{time.strftime('%H:%M:%S')} - Progress: {str(percentage)}% ")
 
-        timer = RepeatTimer(1, display)
+        timer = RepeatTimer(1, show_progress)
         timer.start()
 
         start_time = time.time()
@@ -171,7 +175,7 @@ class Renderer:
 
         end_time = time.time()
         timer.cancel()
-        display()
+        show_progress()
         print(f"Completed raytracing in {end_time - start_time} seconds")
 
         new_shape = (self.height, self.width)

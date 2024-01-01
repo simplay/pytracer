@@ -8,10 +8,10 @@ class PointLightMaterial(Material):
     def __init__(self, emission: np.array):
         self.emission = emission
 
-    def evaluate_brdf(self, hit_record, w_out, w_in) -> np.array:
+    def evaluate_brdf(self, hit_record: HitRecord, w_out: np.array, w_in: np.array) -> np.array:
         return np.array([0, 0, 0])
 
-    def evaluate_emission(self, hit_record, w_out) -> np.array:
+    def evaluate_emission(self, hit_record: HitRecord, w_out: np.array) -> np.array:
         return self.emission
 
     def has_specular_refraction(self) -> bool:

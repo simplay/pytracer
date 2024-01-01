@@ -1,16 +1,18 @@
-import random
-
-# from pytracer import Scene
 import numpy as np
+
+from typing import TYPE_CHECKING
 
 from pytracer.ray import Ray
 
+if TYPE_CHECKING:
+    from pytracer import HitRecord, Scene
+
 
 class DebugIntegrator:
-    def __init__(self, scene):
+    def __init__(self, scene: 'Scene'):
         self.scene = scene
 
-    def is_occluded(self, hit_position, light_dir, tolerance):
+    def is_occluded(self, hit_position: np.array, light_dir: np.array, tolerance: float):
         shadow_ray = Ray(
             origin=np.copy(hit_position),
             direction=light_dir
@@ -26,7 +28,7 @@ class DebugIntegrator:
 
         return has_shadow_hit
 
-    def contribution_of(self, light_source, hit_record):
+    def contribution_of(self, light_source: np.array, hit_record: 'HitRecord'):
         light_hit = light_source.sample()
         light_direction = np.copy(light_hit.position) - hit_record.position
         d2 = light_direction.dot(light_direction)

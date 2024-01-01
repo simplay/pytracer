@@ -1,6 +1,11 @@
 import numpy as np
 from abc import ABC, abstractmethod
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pytracer import HitRecord
+
 
 class Material(ABC):
     """
@@ -9,7 +14,7 @@ class Material(ABC):
     """
 
     @abstractmethod
-    def evaluate_brdf(self, hit_record, w_out, w_in) -> np.array:
+    def evaluate_brdf(self, hit_record: 'HitRecord', w_out: np.array, w_in: np.array) -> np.array:
         """
         Evaluate BRDF for pair of incoming and outgoing directions. This method
         is typically called by an integrator when the integrator obtained the
@@ -26,7 +31,7 @@ class Material(ABC):
         pass
 
     @abstractmethod
-    def evaluate_emission(self, hit_record, w_out) -> np.array:
+    def evaluate_emission(self, hit_record: 'HitRecord', w_out: np.array) -> np.array:
         """
         Evaluate emission for outgoing direction. This method is typically
         called by an integrator when the integrator obtained the outgoing

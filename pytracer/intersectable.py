@@ -1,6 +1,5 @@
 from abc import ABC, abstractmethod
 
-#from pytracer.hit_record import HitRecord
 from pytracer.ray import Ray
 
 

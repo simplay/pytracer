@@ -26,7 +26,7 @@ class IntersectableList(Intersectable):
     def append(self, item: Intersectable):
         self.container.append(item)
 
-    def at(self, index):
+    def at(self, index: int):
         return self.container[index]
 
     def size(self):

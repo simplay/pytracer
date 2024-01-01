@@ -11,12 +11,13 @@ class Diffuse(Material):
         self.emission = emission / np.pi
         self.casts_shadows = casts_shadows
 
-    def evaluate_brdf(self, hit_record, w_out, w_in) -> np.array:
+    def evaluate_brdf(self, hit_record: 'HitRecord', w_out: np.array, w_in: np.array) -> np.array:
         return self.emission
 
-    def evaluate_emission(self, _hit_record, _w_out) -> np.array:
-        if _hit_record.normal.dot(_w_out) < 0:
-            _hit_record.normal = -_hit_record.normal
+    def evaluate_emission(self, hit_record: 'HitRecord', w_out: np.array) -> np.array:
+        if hit_record.normal.dot(w_out) < 0:
+            hit_record.normal = -hit_record.normal
+
         return np.array([0, 0, 0])
 
     def has_specular_reflexion(self) -> bool:

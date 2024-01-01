@@ -57,7 +57,7 @@ class HitRecord:
         return hit_record
 
     @classmethod
-    def make_with_material(cls, position, material):
+    def make_with_material(cls, position: np.array, material: Material):
         zero_v3 = np.array([0, 0, 0])
         hit_record = HitRecord(
             t=0.0,
@@ -74,7 +74,7 @@ class HitRecord:
         return hit_record
 
     @classmethod
-    def make_from_other(cls, other_hit_record):
+    def make_from_other(cls, other_hit_record: 'HitRecord'):
         hit_record = HitRecord(
             t=other_hit_record.t,
             position=np.copy(other_hit_record.position),
@@ -91,6 +91,3 @@ class HitRecord:
 
     def is_valid(self):
         return not self.is_null
-
-    def transform(self, matrix: np.array):
-        return None
