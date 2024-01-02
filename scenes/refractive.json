@@ -114,5 +114,5 @@
       }
     }
   ],
-  "integrator": "debug"
+  "integrator": "whitted"
 }
