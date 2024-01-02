@@ -1,3 +1,5 @@
+import logging
+
 from PIL import Image
 import numpy as np
 import multiprocessing
@@ -82,10 +84,11 @@ class Renderer:
 
         return render_task
 
-    def __init__(self, scene: Scene):
+    def __init__(self, scene: Scene, output_filename: str):
         self.scene = scene
         self.width = scene.width
         self.height = scene.height
+        self.output_filename = output_filename
 
     @staticmethod
     def compute_indices_groups(index_count: int, cpu_count: int) -> np.array:
@@ -94,7 +97,7 @@ class Renderer:
         random.shuffle(indices)
         return np.array_split(indices, cpu_count)
 
-    def write_image(self, red: list, blue: list, green: list):
+    def write_image(self, output_filename, red: list, blue: list, green: list):
         start_time = time.time()
         img_data = np.zeros((self.height, self.width, self.channels), dtype=np.uint8)
 
@@ -115,12 +118,12 @@ class Renderer:
                 img_data[y][x][2] = b * 255
 
         end_time = time.time()
-        print(f"Computed image in {end_time - start_time} seconds")
+        logging.info(f"Wrote image in {end_time - start_time} seconds")
 
         output_image = Image.fromarray(img_data)
 
         project_root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-        filename = 'rendered-image.png'
+        filename = f"{output_filename}.png"
         filepath = os.path.join(project_root_path, 'output', filename)
         output_image.save(filepath)
 
@@ -130,7 +133,7 @@ class Renderer:
         @param thread_count the number of threads used to render the image. By default, the total number of available threads is used.
         """
         cpu_count = thread_count or multiprocessing.cpu_count()
-        print(f"Starting {cpu_count} threads")
+        logging.info(f"Starting {cpu_count} threads")
         index_groups = self.compute_indices_groups(index_count=self.width * self.height, cpu_count=cpu_count)
 
         tasks = []
@@ -151,7 +154,7 @@ class Renderer:
         def show_progress():
             completed_task_count = np.sum(raw_shared_status)
             percentage = int(100 * (completed_task_count / n))
-            print(f"{time.strftime('%H:%M:%S')} - Progress: {str(percentage)}% ")
+            logging.info(f"=> Progress: {str(percentage)}% ")
 
         timer = RepeatTimer(1, show_progress)
         timer.start()
@@ -176,7 +179,7 @@ class Renderer:
         end_time = time.time()
         timer.cancel()
         show_progress()
-        print(f"Completed raytracing in {end_time - start_time} seconds")
+        logging.info(f"Completed raytracing in {end_time - start_time} seconds")
 
         new_shape = (self.height, self.width)
         red = np.reshape(shared_array_base_red, newshape=new_shape)
@@ -191,4 +194,4 @@ class Renderer:
         green = green / green_count
         blue = blue / blue_count
 
-        self.write_image(red, green, blue)
+        self.write_image(self.output_filename, red, green, blue)
