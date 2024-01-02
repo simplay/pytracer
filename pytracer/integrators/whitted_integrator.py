@@ -86,6 +86,18 @@ class WhittedIntegrator(Integrator):
                 spec = self.integrate(reflected_ray)
                 reflection_contribution *= spec
 
+        if hit_record.material.has_specular_refraction() and ray.bounces < MAX_BOUNCES:
+            sample = hit_record.material.evaluate_specular_refraction(hit_record)
+            if sample.is_valid:
+                refraction_contribution = np.copy(sample.brdf)
+                refracted_ray = Ray(
+                    origin=np.copy(hit_record.position),
+                    direction=sample.w,
+                    bounces=ray.bounces + 1
+                )
+                spec = self.integrate(refracted_ray)
+                refraction_contribution *= spec
+
         if hit_record.material.has_specular_reflection() or hit_record.material.has_specular_refraction():
             return reflection_contribution + refraction_contribution
 

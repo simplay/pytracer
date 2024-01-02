@@ -31,3 +31,6 @@ class ReflectiveMaterial(Material):
             is_specular=True,
             p=1.0
         )
+
+    def evaluate_specular_refraction(self, hit_record: 'HitRecord') -> ShadingSample:
+        return ShadingSample.make_empty()

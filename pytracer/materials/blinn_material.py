@@ -38,3 +38,6 @@ class BlinnMaterial(Material):
 
     def evaluate_specular_reflection(self, hit_record: 'HitRecord') -> ShadingSample:
         return ShadingSample.make_empty()
+
+    def evaluate_specular_refraction(self, hit_record: 'HitRecord') -> ShadingSample:
+        return ShadingSample.make_empty()

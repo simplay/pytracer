@@ -32,6 +32,7 @@ class Material(ABC):
 
         pass
 
+    # TODO: verify: should w_out be renamed to w_in?
     @abstractmethod
     def evaluate_emission(self, hit_record: 'HitRecord', w_out: Vec3) -> Vec3:
         """
@@ -61,4 +62,8 @@ class Material(ABC):
 
     @abstractmethod
     def evaluate_specular_reflection(self, hit_record: 'HitRecord') -> ShadingSample:
+        pass
+
+    @abstractmethod
+    def evaluate_specular_refraction(self, hit_record: 'HitRecord') -> ShadingSample:
         pass

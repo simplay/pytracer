@@ -10,28 +10,37 @@ from pytracer.one_sampler import OneSampler
 from pytracer.intersectables.geometries.plane import Plane
 from pytracer.light_sources.point_light import PointLight
 from pytracer.materials.reflective_material import ReflectiveMaterial
+from pytracer.materials.refractive_material import RefractiveMaterial
+from pytracer.materials.grid_textured_material import GridTexturedMaterial
 from pytracer.intersectables.geometries.sphere import Sphere
 from pytracer.math.vec3 import Vec3
 
+MATERIALS = {
+    "blinn": lambda params: BlinnMaterial(diffuse=Vec3(*params["diffuse"]),
+                                          specular=Vec3(*params["specular"]),
+                                          shininess=params["shininess"]),
+    "reflective": lambda params: ReflectiveMaterial(ks=Vec3(*params["ks"])),
+    "refractive": lambda params: RefractiveMaterial(refraction_index=params["refraction_index"],
+                                                    ks=Vec3(*params["ks"])),
+    "diffuse": lambda params: DiffuseMaterial(emission=Vec3(*params["emission"])),
+    "grid": lambda params: GridTexturedMaterial(line_color=Vec3(*params["line_color"]),
+                                                tile_color=Vec3(*params["tile_color"]),
+                                                thickness=params["thickness"],
+                                                shift=Vec3(*params["shift"]),
+                                                scale=params["scale"])
+}
+
+LIGHT_TYPES = {
+    "point_light": lambda params: PointLight(position=Vec3(*params["position"]),
+                                             emission=Vec3(*params["emission"]))
+}
+
+INTEGRATORS = {
+    "whitted": WhittedIntegrator
+}
+
 
 class Scene:
-    MATERIALS = {
-        "blinn": lambda params: BlinnMaterial(diffuse=Vec3(*params["diffuse"]),
-                                              specular=Vec3(*params["specular"]),
-                                              shininess=params["shininess"]),
-        "reflective": lambda params: ReflectiveMaterial(ks=Vec3(*params["ks"])),
-        "diffuse": lambda params: DiffuseMaterial(emission=Vec3(*params["emission"]))
-    }
-
-    LIGHT_TYPES = {
-        "point_light": lambda params: PointLight(position=Vec3(*params["position"]),
-                                                 emission=Vec3(*params["emission"]))
-    }
-
-    INTEGRATORS = {
-        "whitted": WhittedIntegrator
-    }
-
     def __init__(self, scene_filepath: str, width: int, height: int):
         with open(scene_filepath) as file:
             scene_description = json.load(file)
@@ -41,7 +50,7 @@ class Scene:
 
         self.camera = self.build_camera(camera_params=scene_description["camera"])
         self.sampler = OneSampler()
-        self.integrator = self.INTEGRATORS[scene_description["integrator"]](self)
+        self.integrator = INTEGRATORS[scene_description["integrator"]](self)
 
         self.intersectable_list = IntersectableList()
         self.light_sources = []
@@ -70,7 +79,7 @@ class Scene:
             material_type = list(sphere_params["material"])[0]
             material_params = sphere_params["material"][material_type]
             sphere = Sphere(
-                material=self.MATERIALS[material_type](material_params),
+                material=MATERIALS[material_type](material_params),
                 center=Vec3(*sphere_params["center"]),
                 radius=sphere_params["radius"]
             )
@@ -80,7 +89,7 @@ class Scene:
             material_type = list(plane_params["material"])[0]
             material_params = plane_params["material"][material_type]
             plane = Plane(
-                material=self.MATERIALS[material_type](material_params),
+                material=MATERIALS[material_type](material_params),
                 normal=Vec3(*plane_params["normal"]),
                 distance=plane_params["distance"]
             )
@@ -91,5 +100,5 @@ class Scene:
             light_type = list(light_params)[0]
             params = light_params[light_type]
             self.light_sources.append(
-                self.LIGHT_TYPES[light_type](params)
+                LIGHT_TYPES[light_type](params)
             )
