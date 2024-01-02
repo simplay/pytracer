@@ -4,7 +4,7 @@ A raytracer written in python.
 
 ## Setup
 
-1. Clone this repository: `git clone git@github.com:simplay/cpptracer.git`
+1. Clone this repository: `git clone git@github.com:simplay/pytracer.git`
 2. Install dependencies: `pip install -r requirements`
 
 ## Usage
