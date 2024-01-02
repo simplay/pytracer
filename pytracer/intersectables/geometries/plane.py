@@ -15,7 +15,7 @@ if TYPE_CHECKING:
 class Plane(Intersectable):
 
     # A*x + B*y + C*z + D = 0
-    def __init__(self, material: 'Material', normal: Vec3, distance):
+    def __init__(self, material: 'Material', normal: Vec3, distance: float):
         self.material = material
         self.distance = distance
         self.normal = normal

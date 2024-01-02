@@ -18,7 +18,8 @@ class RefractiveMaterial(Material):
     """
 
     def fresnel_factor(self, hit_record: 'HitRecord') -> float:
-        w_in = -Vec3.from_other(hit_record.w_in).normalized()
+        w_in = Vec3.from_other(-hit_record.w_in).normalized()
+
         normal = Vec3.from_other(hit_record.normal)
 
         # enters material
@@ -75,7 +76,7 @@ class RefractiveMaterial(Material):
         )
 
     def evaluate_specular_refraction(self, hit_record: 'HitRecord') -> ShadingSample:
-        w_in = -Vec3.from_other(hit_record.w_in).normalized()
+        w_in = Vec3.from_other(-hit_record.w_in).normalized()
         normal = Vec3.from_other(hit_record.normal)
 
         # enters material
@@ -95,13 +96,13 @@ class RefractiveMaterial(Material):
         if sin_sq_theta_t > 1.0:
             return ShadingSample.make_empty()
 
-        refracted_direction = phase_velocity * w_in
+        refracted_direction = phase_velocity * Vec3.from_other(w_in)
 
         scaled_normal = (phase_velocity * cos_theta_i - np.sqrt(1.0 - sin_sq_theta_t)) * normal
         refracted_direction = refracted_direction + scaled_normal
 
         r = self.fresnel_factor(hit_record)
-        brdf = (1.0 - r) * self.ks
+        brdf = (1.0 - r) * Vec3.from_other(self.ks)
 
         return ShadingSample(
             brdf=brdf,

@@ -18,20 +18,22 @@ class GridTexturedMaterial(Material):
     def evaluate_brdf(self, hit_record: 'HitRecord', w_out: Vec3, w_in: Vec3) -> Vec3:
         diffuse_brdf = self.diffuse.evaluate_brdf(hit_record, w_out, w_in)
         hit_position = Vec3.from_other(hit_record.position)
-        shifted = Vec3.from_other(hit_record.position) + self.shift
+        shifted = Vec3.from_other(hit_record.position)
+        shifted = shifted + self.shift
 
         hit_position = hit_position / self.scale
         shifted = shifted / self.scale
+
         relative_thickness = self.thickness / self.scale
-
-        rounded_position = Vec3.from_other(np.round(hit_position))
-
-        shifted = shifted - rounded_position
+        rounded_positions = Vec3(
+            float(round(hit_position[0])),
+            float(round(hit_position[1])),
+            float(round(hit_position[2]))
+        )
+        shifted = shifted - rounded_positions
         shifted = np.abs(shifted)
 
-        sx, sy, sz = shifted[0], shifted[1], shifted[2]
-
-        if sx < relative_thickness or sy < relative_thickness or sz < relative_thickness:
+        if shifted[0] < relative_thickness or shifted[1] < relative_thickness or shifted[2] < relative_thickness:
             diffuse_brdf *= self.line_color
         else:
             diffuse_brdf *= self.tile_color

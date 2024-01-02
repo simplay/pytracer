@@ -15,7 +15,7 @@ class DiffuseMaterial(Material):
         self.casts_shadows = casts_shadows
 
     def evaluate_brdf(self, hit_record: 'HitRecord', w_out: Vec3, w_in: Vec3) -> Vec3:
-        return self.emission
+        return Vec3.from_other(self.emission)
 
     def evaluate_emission(self, hit_record: 'HitRecord', w_out: Vec3) -> Vec3:
         if hit_record.normal.dot(w_out) < 0:
