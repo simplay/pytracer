@@ -15,8 +15,6 @@ A raytracer written in python.
 
 `python run.py -s scenes/box1.json --width 300 --height 300`
 
--s ../scenes/refractive.json --width 300 --height 300
-
 ### Show Help
 
 `python run.py --help`
