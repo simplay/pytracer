@@ -1,5 +1,6 @@
+import json
+
 from pytracer import Camera
-import numpy as np
 
 from pytracer.materials.blinn_material import BlinnMaterial
 from pytracer.integrators.whitted_integrator import WhittedIntegrator
@@ -14,82 +15,81 @@ from pytracer.math.vec3 import Vec3
 
 
 class Scene:
-    def __init__(self, width: int, height: int):
+    MATERIALS = {
+        "blinn": lambda params: BlinnMaterial(diffuse=Vec3(*params["diffuse"]),
+                                              specular=Vec3(*params["specular"]),
+                                              shininess=params["shininess"]),
+        "reflective": lambda params: ReflectiveMaterial(ks=Vec3(*params["ks"])),
+        "diffuse": lambda params: DiffuseMaterial(emission=Vec3(*params["emission"]))
+    }
+
+    LIGHT_TYPES = {
+        "point_light": lambda params: PointLight(position=Vec3(*params["position"]),
+                                                 emission=Vec3(*params["emission"]))
+    }
+
+    INTEGRATORS = {
+        "whitted": WhittedIntegrator
+    }
+
+    def __init__(self, scene_filepath: str, width: int, height: int):
+        with open(scene_filepath) as file:
+            scene_description = json.load(file)
+
         self.width = width
         self.height = height
-        self.camera = self.build_camera()
+
+        self.camera = self.build_camera(camera_params=scene_description["camera"])
         self.sampler = OneSampler()
-        self.integrator = WhittedIntegrator(self)
+        self.integrator = self.INTEGRATORS[scene_description["integrator"]](self)
+
         self.intersectable_list = IntersectableList()
         self.light_sources = []
 
-        self.build_intersectables()
-        self.build_light_sources()
+        self.build_intersectables(object_params_list=scene_description["objects"])
+        self.build_light_sources(light_params_list=scene_description["lights"])
 
-    def build_camera(self):
-        eye = Vec3(-1.5, 0.0, 7.0)
-        look_at = Vec3(0.0, 0.0, 0.0)
-        up = Vec3(0.0, 1.0, 0.0)
+    def build_camera(self, camera_params) -> Camera:
+        eye = Vec3(*camera_params["eye"])
+        look_at = Vec3(*camera_params["look_at"])
+        up = Vec3(*camera_params["up"])
         aspect_ratio = self.width / self.height
-        return Camera(eye=eye,
-                      look_at=look_at,
-                      up=up,
-                      fov=60.0,
-                      aspect_ratio=aspect_ratio,
-                      width=self.width,
-                      height=self.height)
 
-    def build_intersectables(self):
-        r = 0.4
-        boring_gray = DiffuseMaterial((np.array([0.5, 0.5, 0.5])))
-
-        mirror = ReflectiveMaterial(ks=np.array([1.0, 1.0, 1.0]))
-        blinn_material = BlinnMaterial(
-            diffuse=np.array([.8, 0.0, 0.0]),
-            specular=np.array([0.4, 0.4, 0.4]),
-            shininess=50.0
+        return Camera(
+            eye=eye,
+            look_at=look_at,
+            up=up,
+            fov=camera_params["fov"],
+            aspect_ratio=aspect_ratio,
+            width=self.width,
+            height=self.height
         )
-        sphere = Sphere(
-            material=blinn_material,
-            center=np.array([0.0, 0.0, 0.0]),
-            radius=r
-        )
-        self.intersectable_list.append(sphere)
 
-        distance = 3.0
-        self.intersectable_list.append(Plane(mirror, normal=np.array([1.0, 0.0, 0.0]), distance=distance))
-        self.intersectable_list.append(Plane(boring_gray, normal=np.array([-1.0, 0.0, 0.0]), distance=distance))
-        self.intersectable_list.append(Plane(boring_gray, normal=np.array([0.0, 1.0, 0.0]), distance=distance))
-        self.intersectable_list.append(Plane(boring_gray, normal=np.array([0.0, -1.0, 0.0]), distance=distance))
-        self.intersectable_list.append(Plane(boring_gray, normal=np.array([0.0, 0.0, 1.0]), distance=distance))
-
-    def build_light_sources(self):
-        light_position = np.array([0.4, 0.6, 2.8])
-        self.light_sources.append(
-            PointLight(
-                position=light_position,
-                emission=np.array([1, 1, 1])
+    def build_intersectables(self, object_params_list):
+        for sphere_params in object_params_list["spheres"]:
+            material_type = list(sphere_params["material"])[0]
+            material_params = sphere_params["material"][material_type]
+            sphere = Sphere(
+                material=self.MATERIALS[material_type](material_params),
+                center=Vec3(*sphere_params["center"]),
+                radius=sphere_params["radius"]
             )
-        )
-        r = 0.03
-        sphere = Sphere(
-            material=DiffuseMaterial(np.array([1, 0, 0]), casts_shadows=False),
-            center=light_position + 0.5 * r * np.array([1, 1, 1]),
-            radius=r
-        )
-        # self.intersectable_list.append(sphere)
+            self.intersectable_list.append(sphere)
 
-        light_position = np.array([0.4, 0.7, 0.4])
-        self.light_sources.append(
-            PointLight(
-                position=light_position,
-                emission=np.array([0, 1, 1])
+        for plane_params in object_params_list["planes"]:
+            material_type = list(plane_params["material"])[0]
+            material_params = plane_params["material"][material_type]
+            plane = Plane(
+                material=self.MATERIALS[material_type](material_params),
+                normal=Vec3(*plane_params["normal"]),
+                distance=plane_params["distance"]
             )
-        )
-        r = 0.03
-        sphere = Sphere(
-            material=DiffuseMaterial(np.array([1, 0, 0]), casts_shadows=False),
-            center=light_position + 0.5 * r * np.array([1, 1, 1]),
-            radius=r
-        )
-        # self.intersectable_list.append(sphere)
+            self.intersectable_list.append(plane)
+
+    def build_light_sources(self, light_params_list):
+        for light_params in light_params_list:
+            light_type = list(light_params)[0]
+            params = light_params[light_type]
+            self.light_sources.append(
+                self.LIGHT_TYPES[light_type](params)
+            )
