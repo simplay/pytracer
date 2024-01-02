@@ -85,15 +85,15 @@ def main():
 
     scene_filepath = options.scene_filepath
     spp = options.spp
-    logging.info(f"Start rendering process using the following settings:")
+    logging.info(f"Starting rendering process using the following settings:")
     logging.info(f"  Scene: {scene_filepath}")
-    logging.info(f"  Resolution: {options} x {options.height} pixels")
+    logging.info(f"  Resolution: {options.width} x {options.height} pixels")
     logging.info(f"  Samples per pixel: {spp}")
 
     scene = Scene(scene_filepath=scene_filepath, width=options.width, height=options.height)
     renderer = Renderer(scene, output_filename="rendered_image")
     renderer.render(spp=spp)
-    logging.info("Completed Rendering")
+    logging.info("Completed rendering")
 
 
 if __name__ == '__main__':

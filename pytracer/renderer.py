@@ -118,13 +118,13 @@ class Renderer:
                 img_data[y][x][2] = b * 255
 
         end_time = time.time()
-        logging.info(f"Wrote image in {end_time - start_time} seconds")
 
         output_image = Image.fromarray(img_data)
 
         project_root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
         filename = f"{output_filename}.png"
         filepath = os.path.join(project_root_path, 'output', filename)
+        logging.info(f"Wrote image {filepath} in {end_time - start_time} seconds")
         output_image.save(filepath)
 
     def render(self, spp: int, thread_count: int = None) -> None:
