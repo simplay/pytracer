@@ -9,11 +9,13 @@ A raytracer written in python.
 
 ## Usage
 
-`python run.py -s <PATH_TO_SCENE_JSON> --wdith <WIDTH> --height <HEIGHT>`
+`python run.py -s <PATH_TO_SCENE_JSON> --width <WIDTH> --height <HEIGHT>`
 
 ### Example Usage
 
-`python run.py -s scenes/box.json -width 300 height 300`
+`python run.py -s scenes/box1.json --width 300 --height 300`
+
+-s ../scenes/refractive.json --width 300 --height 300
 
 ### Show Help
 
