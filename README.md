@@ -1,6 +1,14 @@
 # Pyracer
 
+![Alt Text](renderings/refractive_example.png)
+
 A raytracer written in python.
+
+## Features
+
++ Recursive raytracing (Whitted Integrator)
++ Multithreaded
++ Supports reflective and refractive materials
 
 ## Setup
 
