@@ -27,9 +27,8 @@
         ],
         "radius": 1.0,
         "material": {
-          "refractive": {
-            "refraction_index": 1.1,
-            "ks": [
+          "diffuse": {
+            "emission": [
               1.0,
               1.0,
               1.0

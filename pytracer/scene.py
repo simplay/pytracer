@@ -1,6 +1,7 @@
 import json
 
 from pytracer import Camera
+from pytracer.integrators.debug_integrator import DebugIntegrator
 
 from pytracer.materials.blinn_material import BlinnMaterial
 from pytracer.integrators.whitted_integrator import WhittedIntegrator
@@ -36,7 +37,8 @@ LIGHT_TYPES = {
 }
 
 INTEGRATORS = {
-    "whitted": WhittedIntegrator
+    "whitted": WhittedIntegrator,
+    "debug": DebugIntegrator
 }
 
 

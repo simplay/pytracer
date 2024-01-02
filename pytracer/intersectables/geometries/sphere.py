@@ -86,19 +86,24 @@ class Sphere(Intersectable):
         if discriminant >= 0.0:
             t1 = (-b + np.sqrt(discriminant)) / (2.0 * a)
             t2 = (-b - np.sqrt(discriminant)) / (2.0 * a)
-            zeros = [t1, t2]
+            zeros = [t1, t2]  # what if this root is present more than once?
 
         if len(zeros) < 2:
             return HitRecord.make_empty()
         else:
+            # find intersection closer to camera
             t = np.min(zeros)
+            # if the intersection was behind the camera viewing ray
             if t < 0:
+                # then take the one further away from the camera
                 t = np.max(zeros)
+                # if the intersection was behind the camera viewing ray
                 if t < 0:
+                    # then return no viewed intersection
                     return HitRecord.make_empty()
 
         hit_position = ray.point_at(t)
-        hit_normal = (1.0 / self.radius) * (hit_position - self.center)
+        hit_normal = Vec3.from_other(hit_position - self.center).normalized()
 
         w_in = ray.direction.incident_direction()
 

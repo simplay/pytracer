@@ -19,7 +19,8 @@ class DiffuseMaterial(Material):
 
     def evaluate_emission(self, hit_record: 'HitRecord', w_out: Vec3) -> Vec3:
         if hit_record.normal.dot(w_out) < 0:
-            hit_record.normal = -hit_record.normal
+            #hit_record.normal = -hit_record.normal
+            pass
 
         return Vec3.zero()
 
