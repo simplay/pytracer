@@ -2,6 +2,7 @@ import json
 
 from pytracer import Camera
 from pytracer.integrators.debug_integrator import DebugIntegrator
+from pytracer.intersectables.geometries.triangle import Triangle
 
 from pytracer.materials.blinn_material import BlinnMaterial
 from pytracer.integrators.whitted_integrator import WhittedIntegrator
@@ -96,6 +97,17 @@ class Scene:
                 distance=plane_params["distance"]
             )
             self.intersectable_list.append(plane)
+
+        for object_params in object_params_list["triangles"]:
+            material_type = list(object_params["material"])[0]
+            material_params = object_params["material"][material_type]
+            intersectable = Triangle(
+                material=MATERIALS[material_type](material_params),
+                a=Vec3(*object_params["a"]),
+                b=Vec3(*object_params["b"]),
+                c=Vec3(*object_params["c"])
+            )
+            self.intersectable_list.append(intersectable)
 
     def build_light_sources(self, light_params_list):
         for light_params in light_params_list:
