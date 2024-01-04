@@ -2,6 +2,7 @@ import json
 
 from pytracer import Camera
 from pytracer.integrators.debug_integrator import DebugIntegrator
+from pytracer.intersectables.containers.mesh import Mesh
 from pytracer.intersectables.geometries.triangle import Triangle
 
 from pytracer.materials.blinn_material import BlinnMaterial
@@ -106,6 +107,15 @@ class Scene:
                 a=Vec3(*object_params["a"]),
                 b=Vec3(*object_params["b"]),
                 c=Vec3(*object_params["c"])
+            )
+            self.intersectable_list.append(intersectable)
+
+        for object_params in object_params_list["meshes"]:
+            material_type = list(object_params["material"])[0]
+            material_params = object_params["material"][material_type]
+            intersectable = Mesh(
+                material=MATERIALS[material_type](material_params),
+                filepath=object_params["filepath"]
             )
             self.intersectable_list.append(intersectable)
 

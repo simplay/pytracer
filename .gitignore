@@ -4,3 +4,4 @@ ctag
 __pycache__
 logs
 *.pyc
+meshes

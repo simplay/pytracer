@@ -9,6 +9,12 @@ import logging
 from datetime import date
 from pathlib import Path
 
+from pytracer.intersectables.containers.mesh import Mesh
+from pytracer.intersectables.geometries.triangle import MeshTriangle
+from pytracer.intersectables.obj_reader import ObjReader
+from pytracer.materials.diffuse_material import DiffuseMaterial
+from pytracer.math.vec3 import Vec3
+
 ROOT_PATH = Path(__file__).parent.parent
 
 

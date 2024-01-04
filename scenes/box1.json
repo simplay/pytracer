@@ -18,6 +18,8 @@
     "fov": 60
   },
   "objects": {
+    "meshes": [],
+    "triangles": [],
     "spheres": [
       {
         "center": [
