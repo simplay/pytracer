@@ -96,11 +96,9 @@ def main():
     logging.info(f"  Resolution: {options.width} x {options.height} pixels")
     logging.info(f"  Samples per pixel: {spp}")
 
-    material = DiffuseMaterial(emission=Vec3(1.0, 1.0, 1.0))
-    Mesh(material, "../meshes/teapot.obj")
-    # scene = Scene(scene_filepath=scene_filepath, width=options.width, height=options.height)
-    # renderer = Renderer(scene, output_filename="rendered_image")
-    # renderer.render(spp=spp)
+    scene = Scene(scene_filepath=scene_filepath, width=options.width, height=options.height)
+    renderer = Renderer(scene, output_filename="rendered_image")
+    renderer.render(spp=spp)
     logging.info("Completed rendering")
 
 

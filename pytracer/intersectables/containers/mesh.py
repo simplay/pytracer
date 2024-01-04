@@ -1,11 +1,15 @@
-from pytracer import Material
 from pytracer.intersectables.containers.intersectable_list import IntersectableList
 from pytracer.intersectables.geometries.triangle import MeshTriangle, Triangle
 from pytracer.intersectables.obj_reader import ObjReader
 
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from pytracer import Material
+
 
 class Mesh(IntersectableList):
-    def __init__(self, material: Material, filepath: str):
+    def __init__(self, material: 'Material', filepath: str, use_face_normals=False):
         super().__init__()
 
         mesh = ObjReader.read(filepath)
@@ -16,7 +20,7 @@ class Mesh(IntersectableList):
             vy = mesh.vertices[id_y - 1]
             vz = mesh.vertices[id_z - 1]
 
-            if len(mesh.normals) > 0:
+            if len(mesh.normals) > 0 and use_face_normals:
                 normal_face = mesh.normal_faces[face_idx]
 
                 id_nx, id_ny, id_nz = normal_face[0], normal_face[1], normal_face[2]

@@ -1,9 +1,9 @@
 {
   "camera": {
     "eye": [
+      0.25,
       0.5,
-      0.5,
-      3.0
+      4.0
     ],
     "look_at": [
       0.5,
@@ -18,36 +18,47 @@
     "fov": 60
   },
   "objects": {
-    "spheres": [],
-    "planes": [],
-    "triangles": [
+    "meshes": [
       {
         "material": {
-          "diffuse": {
-            "emission": [
+          "blinn": {
+            "diffuse": [
+              0.0,
+              1.0,
+              0.0
+            ],
+            "specular": [
               1.0,
               1.0,
               1.0
-            ]
+            ],
+            "shininess": 50.0
           }
         },
-        "a": [
-          0.0,
-          0.0,
-          0.0
-        ],
-        "b": [
-          1.0,
-          0.0,
-          0.0
-        ],
-        "c": [
-          0.0,
-          1.0,
-          0.0
-        ]
+        "filepath": "../meshes/teapot.obj"
       }
-    ]
+    ],
+    "spheres": [],
+    "planes": [
+      {
+        "normal": [
+          0.0,
+          0.0,
+          1.0
+        ],
+        "distance": 2.15,
+        "material": {
+          "diffuse": {
+            "emission": [
+              0.2,
+              0.0,
+              0.0
+            ]
+          }
+        }
+      }
+    ],
+    "triangles": []
   },
   "lights": [
     {
@@ -55,7 +66,7 @@
         "position": [
           0.0,
           0.0,
-          3.0
+          7.0
         ],
         "emission": [
           1.0,

@@ -13,6 +13,11 @@ if TYPE_CHECKING:
 
 
 class Triangle(Intersectable):
+    """
+    Construct a plane given its normal and distance to the origin Note that the
+    distance is along the direction that the normal points (meaning that the
+    sign of distance matters)
+    """
 
     def __init__(self, material: 'Material', a: Vec3, b: Vec3, c: Vec3, face_id: int):
         self.material = material
@@ -85,7 +90,7 @@ class Triangle(Intersectable):
             return HitRecord.make_empty()
 
         intersection_position = ray.point_at(t)
-        hit_normal = self.compute_normal()
+        hit_normal = self.compute_normal(0, 0)
         w_in = ray.direction.incident_direction()
         hit_tangent = Vec3.one()  # TODO: fixme
 
