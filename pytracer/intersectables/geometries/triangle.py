@@ -14,11 +14,17 @@ if TYPE_CHECKING:
 
 class Triangle(Intersectable):
 
-    def __init__(self, material: 'Material', a: Vec3, b: Vec3, c: Vec3):
+    def __init__(self, material: 'Material', a: Vec3, b: Vec3, c: Vec3, face_id: int):
         self.material = material
         self.a = a
         self.b = b
         self.c = c
+        self.face_id = face_id
+
+    def compute_normal(self, _alpha: float = 0.0, _beta: float = 0.0):
+        ba = self.b - self.a
+        ca = self.c - self.a
+        return ba.cross(ca).normalized()
 
     def intersect(self, ray: Ray) -> HitRecord:
         """
@@ -79,7 +85,7 @@ class Triangle(Intersectable):
             return HitRecord.make_empty()
 
         intersection_position = ray.point_at(t)
-        hit_normal = ba.cross(ca).normalized()
+        hit_normal = self.compute_normal()
         w_in = ray.direction.incident_direction()
         hit_tangent = Vec3.one()  # TODO: fixme
 
@@ -93,3 +99,17 @@ class Triangle(Intersectable):
             material=self.material
         )
         return hit_record
+
+
+class MeshTriangle(Triangle):
+    def __init__(self, material: 'Material', a: Vec3, b: Vec3, c: Vec3, nx: Vec3, ny: Vec3, nz: Vec3, face_id: int):
+        super().__init__(material, a, b, c, face_id)
+        self.nx = nx
+        self.ny = ny
+        self.nz = nz
+
+    def compute_normal(self, u: float, v: float):
+        w = 1 - u - v
+        normal = Vec3.from_other(w * self.nx + u * self.ny + v * self.nz)
+        normal.normalized()
+        return normal

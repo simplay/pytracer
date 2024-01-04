@@ -35,6 +35,7 @@ class ObjReader:
                 case 'v':
                     vx, vy, vz, *_ = [float(item) for item in rest]
                     v = Vec3(vx, vy, vz)
+                    vertices.append(v)
                 case 'vn':
                     nx, ny, nz, *_ = [float(item) for item in rest]
                     normal = Vec3(nx, ny, nz).normalized()

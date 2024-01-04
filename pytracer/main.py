@@ -9,7 +9,11 @@ import logging
 from datetime import date
 from pathlib import Path
 
+from pytracer.intersectables.containers.mesh import Mesh
+from pytracer.intersectables.geometries.triangle import MeshTriangle
 from pytracer.intersectables.obj_reader import ObjReader
+from pytracer.materials.diffuse_material import DiffuseMaterial
+from pytracer.math.vec3 import Vec3
 
 ROOT_PATH = Path(__file__).parent.parent
 
@@ -92,7 +96,8 @@ def main():
     logging.info(f"  Resolution: {options.width} x {options.height} pixels")
     logging.info(f"  Samples per pixel: {spp}")
 
-    ObjReader.read("../meshes/teapot.obj")
+    material = DiffuseMaterial(emission=Vec3(1.0, 1.0, 1.0))
+    Mesh(material, "../meshes/teapot.obj")
     # scene = Scene(scene_filepath=scene_filepath, width=options.width, height=options.height)
     # renderer = Renderer(scene, output_filename="rendered_image")
     # renderer.render(spp=spp)
