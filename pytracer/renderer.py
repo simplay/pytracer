@@ -14,6 +14,67 @@ from pytracer import RenderTask
 from pytracer import Scene
 
 
+def init_shared_state(
+        n,
+        shared_array_base_red,
+        shared_array_base_green,
+        shared_array_base_blue,
+        shared_array_base_red_count,
+        shared_array_base_green_count,
+        shared_array_base_blue_count,
+        raw_shared_status
+):
+    """ store pixels for later use """
+
+    global pixels_red
+    global pixels_green
+    global pixels_blue
+
+    global pixel_red_count
+    global pixel_green_count
+    global pixel_blue_count
+
+    global shared_status
+
+    pixels_red = np.ctypeslib.as_array(shared_array_base_red.get_obj())
+    pixels_green = np.ctypeslib.as_array(shared_array_base_green.get_obj())
+    pixels_blue = np.ctypeslib.as_array(shared_array_base_blue.get_obj())
+
+    pixel_red_count = np.ctypeslib.as_array(shared_array_base_red_count.get_obj())
+    pixel_green_count = np.ctypeslib.as_array(shared_array_base_green_count.get_obj())
+    pixel_blue_count = np.ctypeslib.as_array(shared_array_base_blue_count.get_obj())
+
+    shared_status = np.ctypeslib.as_array(raw_shared_status.get_obj())
+    for idx in range(n):
+        shared_status[idx] = 0
+
+
+def compute_contribution(render_task: RenderTask) -> RenderTask:
+    # perform actual computations here...
+    for idx in render_task.indices:
+        samples = render_task.scene.sampler.make_sample(render_task.spp, 2)
+
+        for sample in samples:
+            #  compute 2D image lookup coordinates (rowIdx, colIdx) from 1D index value
+            row_idx = idx // render_task.width
+            col_idx = idx % render_task.width
+
+            ray = render_task.scene.camera.make_worldspace_ray(row_idx, col_idx, sample)
+            spectrum = render_task.scene.integrator.integrate(ray)
+
+            pixels_red[idx] += spectrum[0]
+            pixels_green[idx] += spectrum[1]
+            pixels_blue[idx] += spectrum[2]
+
+            pixel_red_count[idx] += 1
+            pixel_green_count[idx] += 1
+            pixel_blue_count[idx] += 1
+
+        shared_status[idx] = 1
+
+    return render_task
+
+
 class RepeatTimer(Timer):
     def run(self):
         while not self.finished.wait(self.interval):
@@ -22,67 +83,6 @@ class RepeatTimer(Timer):
 
 class Renderer:
     channels = 3
-
-    @staticmethod
-    def init_shared_state(
-            n,
-            shared_array_base_red,
-            shared_array_base_green,
-            shared_array_base_blue,
-            shared_array_base_red_count,
-            shared_array_base_green_count,
-            shared_array_base_blue_count,
-            raw_shared_status
-    ):
-        """ store pixels for later use """
-
-        global pixels_red
-        global pixels_green
-        global pixels_blue
-
-        global pixel_red_count
-        global pixel_green_count
-        global pixel_blue_count
-
-        global shared_status
-
-        pixels_red = np.ctypeslib.as_array(shared_array_base_red.get_obj())
-        pixels_green = np.ctypeslib.as_array(shared_array_base_green.get_obj())
-        pixels_blue = np.ctypeslib.as_array(shared_array_base_blue.get_obj())
-
-        pixel_red_count = np.ctypeslib.as_array(shared_array_base_red_count.get_obj())
-        pixel_green_count = np.ctypeslib.as_array(shared_array_base_green_count.get_obj())
-        pixel_blue_count = np.ctypeslib.as_array(shared_array_base_blue_count.get_obj())
-
-        shared_status = np.ctypeslib.as_array(raw_shared_status.get_obj())
-        for idx in range(n):
-            shared_status[idx] = 0
-
-    @staticmethod
-    def compute_contribution(render_task: RenderTask) -> RenderTask:
-        # perform actual computations here...
-        for idx in render_task.indices:
-            samples = render_task.scene.sampler.make_sample(render_task.spp, 2)
-
-            for sample in samples:
-                #  compute 2D image lookup coordinates (rowIdx, colIdx) from 1D index value
-                row_idx = idx / render_task.width
-                col_idx = idx % render_task.width
-
-                ray = render_task.scene.camera.make_worldspace_ray(row_idx, col_idx, sample)
-                spectrum = render_task.scene.integrator.integrate(ray)
-
-                pixels_red[idx] += spectrum[0]
-                pixels_green[idx] += spectrum[1]
-                pixels_blue[idx] += spectrum[2]
-
-                pixel_red_count[idx] += 1
-                pixel_green_count[idx] += 1
-                pixel_blue_count[idx] += 1
-
-            shared_status[idx] = 1
-
-        return render_task
 
     def __init__(self, scene: Scene, output_filename: str):
         self.scene = scene
@@ -162,7 +162,7 @@ class Renderer:
         start_time = time.time()
         with Pool(
                 processes=cpu_count,
-                initializer=self.init_shared_state,
+                initializer=init_shared_state,
                 initargs=(
                         n,
                         shared_array_base_red,
@@ -174,7 +174,7 @@ class Renderer:
                         raw_shared_status
 
                 )) as pool:
-            pool.map(self.compute_contribution, tasks)
+            pool.map(compute_contribution, tasks)
 
         end_time = time.time()
         timer.cancel()
@@ -182,13 +182,25 @@ class Renderer:
         logging.info(f"Completed raytracing in {end_time - start_time} seconds")
 
         new_shape = (self.height, self.width)
-        red = np.reshape(shared_array_base_red, newshape=new_shape)
-        green = np.reshape(shared_array_base_blue, newshape=new_shape)
-        blue = np.reshape(shared_array_base_green, newshape=new_shape)
 
-        red_count = np.reshape(shared_array_base_red_count, newshape=new_shape)
-        green_count = np.reshape(shared_array_base_blue_count, newshape=new_shape)
-        blue_count = np.reshape(shared_array_base_green_count, newshape=new_shape)
+        red = np.reshape(np.frombuffer(shared_array_base_red.get_obj()), newshape=new_shape)
+        green = np.reshape(np.frombuffer(shared_array_base_blue.get_obj()), newshape=new_shape)
+        blue = np.reshape(np.frombuffer(shared_array_base_green.get_obj()), newshape=new_shape)
+
+        red_count = np.reshape(
+            np.frombuffer(shared_array_base_red_count.get_obj(), dtype='int32'),
+            newshape=new_shape
+        ) + 1e-8
+
+        green_count = np.reshape(
+            np.frombuffer(shared_array_base_green_count.get_obj(), dtype='int32'),
+            newshape=new_shape
+        ) + 1e-8
+
+        blue_count = np.reshape(
+            np.frombuffer(shared_array_base_blue_count.get_obj(), dtype='int32'),
+            newshape=new_shape
+        ) + 1e-8
 
         red = red / red_count
         green = green / green_count
